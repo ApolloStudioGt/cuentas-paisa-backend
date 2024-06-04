@@ -25,3 +25,14 @@ model User {
 
   @@index([isActive])
 }
+
+model Customer {
+  id        String  @id @default(uuidv4())
+  fullName  String
+  nit       String  @unique
+  email     String
+  phone     String
+  isActive  Boolean @default(true)
+  
+  @@index([isActive])
+}
