@@ -16,6 +16,8 @@ export class CustomerService {
             email: customer.email,
             phone: customer.phone,
             isActive: customer.isActive,
+            createdAt: customer.createdAt,
+            updatedAt: customer.updatedAt
         }));
     }
 
@@ -28,6 +30,8 @@ export class CustomerService {
             email: customer.email,
             phone: customer.phone,
             isActive: customer.isActive,
+            createdAt: customer.createdAt,
+            updatedAt: customer.updatedAt
         }));
     }
 
@@ -40,6 +44,8 @@ export class CustomerService {
             email: customer.email,
             phone: customer.phone,
             isActive: customer.isActive,
+            createdAt: customer.createdAt,
+            updatedAt: customer.updatedAt
         };
     }
 
@@ -79,7 +85,7 @@ export class CustomerService {
         return `Cliente ${updatedCustomer.fullName} actualizado correctamente`;
     }
 
-    async desactivateCustomer(id: string): Promise<string> {
+    async deleteCustomer(id: string): Promise<string> {
 
         await this.findOne(id);
 

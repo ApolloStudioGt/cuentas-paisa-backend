@@ -8,17 +8,17 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 export class CustomerController {
     constructor(private readonly customerService: CustomerService) {}
 
-    @Get('GetAllCustomers')
+    @Get('AllCustomers')
     async getAllCustomers(): Promise<Customer[]> {
         return this.customerService.getAllCustomers();
     }
 
-    @Get('GetActiveCustomers')
+    @Get('ActiveCustomers')
     async getActiveCustomers(): Promise<Customer[]> {
         return this.customerService.getActiveCustomers();
     }
 
-    @Get('GetCustomerById/:id') 
+    @Get('CustomerById/:id') 
     async getCustomerById(@Param('id') id: string): Promise<Customer>{
         return this.customerService.getCustomerById(id);
     }
@@ -33,8 +33,8 @@ export class CustomerController {
         return this.customerService.updateCustomer(id, updateCustomerDto);
     }
 
-    @Patch('DesactivateCustomer/:id')
-    async desactivateCustomer(@Param('id') id: string): Promise<string> {
-        return this.customerService.desactivateCustomer(id);
+    @Patch('DeleteCustomer/:id')
+    async deleteCustomer(@Param('id') id: string): Promise<string> {
+        return this.customerService.deleteCustomer(id);
     }
 }
