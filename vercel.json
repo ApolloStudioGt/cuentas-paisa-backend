@@ -18,13 +18,5 @@
                 "OPTIONS"
             ]
         }
-    ],
-    "hooks": {
-        "prebuild": {
-            "command": "npm run migrate",
-            "includeFiles": [
-                "prisma/schema.prisma"
-            ]
-        }
-    }
+    ]
 }
