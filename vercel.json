@@ -19,7 +19,9 @@
             ]
         }
     ],
-    "hooks": {
-        "postdeploy": "npm run migrate"
-    }
+    "hooks": [
+        {
+            "postdeploy": "npm run migrate"
+        }
+    ]
 }
