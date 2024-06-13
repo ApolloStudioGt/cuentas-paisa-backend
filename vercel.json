@@ -19,5 +19,12 @@
             ]
         }
     ],
-    "postinstall": "prisma migrate deploy --schema=./prisma/schema.prisma"
+    "hooks": {
+        "prebuild": {
+            "command": "npm run migrate",
+            "includeFiles": [
+                "prisma/schema.prisma"
+            ]
+        }
+    }
 }
