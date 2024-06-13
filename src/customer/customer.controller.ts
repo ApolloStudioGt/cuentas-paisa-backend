@@ -8,44 +8,46 @@ import {
   Delete,
 } from '@nestjs/common';
 import { CustomerService } from './customer.service';
-import { Customer } from '@prisma/client';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
 @Controller('customer')
+@ApiTags('customer')
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  @Get('')
-  async findAll() {
-    return this.customerService.getAllCustomers();
-  }
-
-  @Get('ActiveCustomers')
-  async findAllActives(): Promise<Customer[]> {
-    return this.customerService.getActiveCustomers();
-  }
-
-  @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Customer> {
-    return this.customerService.getCustomerById(id);
-  }
-
   @Post()
-  async create(@Body() createCustomerDto: CreateCustomerDto): Promise<string> {
-    return this.customerService.createCustomer(createCustomerDto);
+  create(@Body() createCustomerDto: CreateCustomerDto) {
+    return this.customerService.create(createCustomerDto);
+  }
+
+  @Get()
+  findAll() {
+    return this.customerService.findAll();
+  }
+
+  @Get('id/:id')
+  findOne(@Param('id') id: string) {
+    return this.customerService.findOne(id);
+  }
+
+  @Get('active')
+  findAllActive() {
+    return this.customerService.findAllActive();
   }
 
   @Patch(':id')
-  async update(
+  @ApiBody({ type: CreateCustomerDto })
+  update(
     @Param('id') id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
-  ): Promise<string> {
-    return this.customerService.updateCustomer(id, updateCustomerDto);
+  ) {
+    return this.customerService.update(id, updateCustomerDto);
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<string> {
-    return this.customerService.deleteCustomer(id);
+  remove(@Param('id') id: string) {
+    return this.customerService.remove(id);
   }
 }
