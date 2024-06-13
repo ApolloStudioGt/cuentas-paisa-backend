@@ -18,5 +18,8 @@
                 "OPTIONS"
             ]
         }
-    ]
+    ],
+    "hooks": {
+        "postdeploy": "npm run migrate"
+    }
 }
