@@ -1,15 +1,20 @@
-import { IsString } from "class-validator";
+import { IsString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateCustomerDto {
-    @IsString()
-    fullName: string;
+  @ApiProperty({ description: 'Customer full name' })
+  @IsString()
+  fullName: string;
 
-    @IsString()
-    nit: string;
+  @ApiProperty({ description: 'Customer nit' })
+  @IsString()
+  nit: string;
 
-    @IsString()
-    email: string;
+  @ApiProperty({ description: 'Customer email' })
+  @IsString()
+  email: string;
 
-    @IsString()
-    phone: string;
+  @ApiProperty({ description: 'Customer phone number' })
+  @IsString()
+  phone: string;
 }
