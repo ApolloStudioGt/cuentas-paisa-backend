@@ -5,10 +5,8 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from 'src/common/decorators/roles.decorator';
 import { Role } from 'src/common/enums/role.enum';
 import { AuthService } from '../auth.service';
-import { IS_PUBLIC_KEY } from 'src/common/decorators/public-api.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -18,7 +16,7 @@ export class RolesGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -31,7 +29,7 @@ export class RolesGuard implements CanActivate {
     const user = await this.authService.decodeUserByToken(token);
     if (user['Role'].toLowerCase().includes(Role.Admin)) return true;
 
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
+    const requiredRoles = this.reflector.getAllAndOverride<Role[]>('roles', [
       context.getHandler(),
       context.getClass(),
     ]);
