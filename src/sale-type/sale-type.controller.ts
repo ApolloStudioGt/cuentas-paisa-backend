@@ -1,7 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { SaleTypeService } from './sale-type.service';
 import { ApiTags } from '@nestjs/swagger';
-import { Public } from 'src/common/decorators/public-api.decorator';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('sale-type')
 @ApiTags('sale-type')

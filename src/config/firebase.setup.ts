@@ -24,8 +24,6 @@ export class FirebaseAdmin implements OnApplicationBootstrap {
         credential: admin.credential.cert(serviceAccount),
       });
 
-      console.log(envs.firebaseApiKey);
-
       const firebaseConfig = {
         apiKey: envs.firebaseApiKey,
         authDomain: envs.firebaseAuthDomain,
