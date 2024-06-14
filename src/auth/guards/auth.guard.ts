@@ -14,13 +14,13 @@ export class AuthGuard implements CanActivate {
     private reflector: Reflector,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
-      context.getHandler(),
-      context.getClass(),
-    ]);
-    if (isPublic) {
-      return true;
-    }
+    // const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+    //   context.getHandler(),
+    //   context.getClass(),
+    // ]);
+    // if (isPublic) {
+    //   return true;
+    // }
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
