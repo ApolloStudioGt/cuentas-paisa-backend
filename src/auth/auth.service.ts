@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from './user/user.service';
-import { FirebaseAdmin } from 'src/config/firebase.setup';
 import { v4 as uuid } from 'uuid';
 import { UserRecord } from 'firebase-admin/lib/auth/user-record';
 import {
@@ -10,6 +9,7 @@ import {
 } from 'firebase/auth';
 import { SingUpDto } from './dto/singUp.dto';
 import { SignInDto } from './dto/singIn.dto';
+import { FirebaseAdmin } from '../config/firebase.setup';
 
 @Injectable()
 export class AuthService {
