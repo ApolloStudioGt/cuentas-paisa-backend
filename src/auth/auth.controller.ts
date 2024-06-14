@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { SingUpDto } from './dto/singUp.dto';
 import { UserService } from './user/user.service';
 import { SignInDto } from './dto/singIn.dto';
-import { PublicApi } from 'src/common/decorators/public.decorator';
+import { PublicApi } from 'src/common/decorators/public-api.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
