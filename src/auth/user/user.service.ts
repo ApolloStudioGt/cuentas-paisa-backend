@@ -1,10 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaClient, User } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
-  private prisma = new PrismaClient();
+  constructor(private readonly prismaService: PrismaService) {}
   async findOne(email: string): Promise<User> {
-    return this.prisma.user.findUnique({ where: { email, isActive: true } });
+    const user: User = await this.prismaService.user.findUnique({
+      where: { email, isActive: true },
+    });
+
+    if (user) {
+      return user;
+    } else {
+      throw new NotFoundException('User not found');
+    }
+  }
+
+  async findAll(): Promise<User[]> {
+    return await this.prismaService.user.findMany({
+      where: { isActive: true },
+    });
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    return this.prismaService.user.create({
+      data: createUserDto,
+    });
   }
 }

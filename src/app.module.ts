@@ -5,6 +5,8 @@ import { PaymentModule } from './payment/payment.module';
 import { SaleTypeModule } from './sale-type/sale-type.module';
 import { AccountCutOffModule } from './account-cut-off/account-cut-off.module';
 import { AuthModule } from './auth/auth.module';
+import { FirebaseAdmin } from './config/firebase.setup';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { AuthModule } from './auth/auth.module';
     PaymentModule,
     SaleTypeModule,
     AccountCutOffModule,
+    PrismaModule,
   ],
+  providers: [FirebaseAdmin],
 })
 export class AppModule {}
