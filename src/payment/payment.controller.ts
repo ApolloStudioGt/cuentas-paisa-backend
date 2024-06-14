@@ -17,12 +17,6 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new payment transaction' })
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
-  }
-
   @Get()
   findAll() {
     return this.paymentService.findAll();
@@ -31,6 +25,12 @@ export class PaymentController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.paymentService.findOne(id);
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new payment transaction' })
+  create(@Body() createPaymentDto: CreatePaymentDto) {
+    return this.paymentService.create(createPaymentDto);
   }
 
   @Patch(':id')

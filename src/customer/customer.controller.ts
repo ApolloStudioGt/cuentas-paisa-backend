@@ -17,11 +17,6 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 export class CustomerController {
   constructor(private readonly customerService: CustomerService) {}
 
-  @Post()
-  create(@Body() createCustomerDto: CreateCustomerDto) {
-    return this.customerService.create(createCustomerDto);
-  }
-
   @Get()
   findAll() {
     return this.customerService.findAll();
@@ -35,6 +30,11 @@ export class CustomerController {
   @Get('active')
   findAllActive() {
     return this.customerService.findAllActive();
+  }
+
+  @Post()
+  create(@Body() createCustomerDto: CreateCustomerDto) {
+    return this.customerService.create(createCustomerDto);
   }
 
   @Patch(':id')
