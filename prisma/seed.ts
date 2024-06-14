@@ -22,7 +22,19 @@ async function main() {
     },
   });
 
-  console.log({ saleTypeSale, saleTypeWork });
+  const adminUser = await prisma.user.upsert({
+    where: {
+      id: '53d05e3d-8ec2-43d6-90a8-247f3afe7c1e',
+    },
+    update: {},
+    create: {
+      fullName: 'admin',
+      id: '53d05e3d-8ec2-43d6-90a8-247f3afe7c1e',
+      email: 'kevingil1910@gmail.com',
+    },
+  });
+
+  console.log({ saleTypeSale, saleTypeWork, adminUser });
 }
 
 main()
