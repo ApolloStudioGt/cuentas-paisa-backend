@@ -1,14 +1,12 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class SaleTypeService extends PrismaClient implements OnModuleInit {
-  onModuleInit() {
-    this.$connect();
-  }
+export class SaleTypeService {
+  constructor(private readonly prismaService: PrismaService) {}
 
   async findAll() {
-    return await this.saleType.findMany({
+    return await this.prismaService.saleType.findMany({
       where: { isActive: true },
     });
   }

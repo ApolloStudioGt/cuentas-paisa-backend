@@ -1,25 +1,25 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
-import { PrismaClient, Sale } from '@prisma/client';
+import { PrismaService } from '../prisma/prisma.service';
+import { Sale } from '@prisma/client';
 
 @Injectable()
-export class SaleService extends PrismaClient implements OnModuleInit {
-  onModuleInit() {
-    this.$connect();
-  }
+export class SaleService {
+  constructor(private readonly prismaService: PrismaService) {}
+
   async create(createSaleDto: CreateSaleDto): Promise<Sale> {
-    return this.sale.create({ data: createSaleDto });
+    return this.prismaService.sale.create({ data: createSaleDto });
   }
 
   async findAll(): Promise<Sale[]> {
-    return await this.sale.findMany({
+    return await this.prismaService.sale.findMany({
       where: { isActive: true },
     });
   }
 
   async findOne(id: string): Promise<Sale | string> {
-    const sale = await this.sale.findUnique({
+    const sale = await this.prismaService.sale.findUnique({
       where: { id, isActive: true },
     });
 
@@ -30,7 +30,7 @@ export class SaleService extends PrismaClient implements OnModuleInit {
 
   async update(id: string, updateSaleDto: UpdateSaleDto): Promise<Sale> {
     await this.findOne(id);
-    return await this.sale.update({
+    return await this.prismaService.sale.update({
       where: { id },
       data: updateSaleDto,
     });
@@ -38,7 +38,7 @@ export class SaleService extends PrismaClient implements OnModuleInit {
 
   async remove(id: string): Promise<Sale> {
     await this.findOne(id);
-    return await this.sale.update({
+    return await this.prismaService.sale.update({
       where: { id },
       data: { isActive: false },
     });

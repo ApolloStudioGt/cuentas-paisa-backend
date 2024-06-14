@@ -1,19 +1,18 @@
-import { Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
-import { Customer, PrismaClient } from '@prisma/client';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { Customer } from '@prisma/client';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
-export class CustomerService extends PrismaClient implements OnModuleInit {
-  onModuleInit() {
-    this.$connect();
-  }
+export class CustomerService {
+  constructor(private readonly prismaService: PrismaService) {}
   async findAll(): Promise<Customer[]> {
-    return await this.customer.findMany();
+    return await this.prismaService.customer.findMany();
   }
 
   async findAllActive(): Promise<Customer[]> {
-    return await this.customer.findMany({
+    return await this.prismaService.customer.findMany({
       where: { isActive: true },
     });
   }
@@ -21,7 +20,7 @@ export class CustomerService extends PrismaClient implements OnModuleInit {
   async create(
     createcustomerDto: CreateCustomerDto,
   ): Promise<Customer | string> {
-    const existingCustomer = await this.customer.findUnique({
+    const existingCustomer = await this.prismaService.customer.findUnique({
       where: { nit: createcustomerDto.nit },
     });
 
@@ -29,11 +28,13 @@ export class CustomerService extends PrismaClient implements OnModuleInit {
       return `The customer with the NIT ${existingCustomer.nit} already exists`;
     }
 
-    return await this.customer.create({ data: createcustomerDto });
+    return await this.prismaService.customer.create({
+      data: createcustomerDto,
+    });
   }
 
   async findOne(id: string): Promise<Customer | string> {
-    const customer = await this.customer.findFirst({
+    const customer = await this.prismaService.customer.findFirst({
       where: { id, isActive: true },
     });
 
@@ -48,7 +49,7 @@ export class CustomerService extends PrismaClient implements OnModuleInit {
   ): Promise<Customer> {
     await this.findOne(id);
 
-    return await this.customer.update({
+    return await this.prismaService.customer.update({
       where: { id },
       data: updateCustomerDto,
     });
@@ -57,7 +58,7 @@ export class CustomerService extends PrismaClient implements OnModuleInit {
   async remove(id: string): Promise<Customer> {
     const customer: Customer | string = await this.findOne(id);
     if (typeof customer === 'string') throw new NotFoundException(customer);
-    return await this.customer.update({
+    return await this.prismaService.customer.update({
       where: { id },
       data: { isActive: false },
     });
