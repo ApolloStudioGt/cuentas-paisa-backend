@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { SingUpDto } from './dto/singUp.dto';
 import { UserService } from './user/user.service';
 import { SignInDto } from './dto/singIn.dto';
-import { Public } from 'src/common/decorators/public.decorator';
+import { PublicApi } from 'src/common/decorators/public.decorator';
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -26,7 +26,7 @@ export class AuthController {
     return this.authService.create(singUpDto);
   }
 
-  @Public()
+  @PublicApi()
   @Post('singin')
   async login(@Body() signInDto: SignInDto) {
     return this.authService.login(signInDto);
