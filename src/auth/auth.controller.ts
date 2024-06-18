@@ -27,7 +27,7 @@ export class AuthController {
   }
 
   @PublicApi()
-  @Post('singin')
+  @Post('login')
   async login(@Body() signInDto: SignInDto) {
     return this.authService.login(signInDto);
   }
