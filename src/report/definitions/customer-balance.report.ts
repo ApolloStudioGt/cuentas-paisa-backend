@@ -16,9 +16,12 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
 
     let totalAmount = 0;
 
-    const customerBalanceRows = customerBalance.map((balance) => {
-        totalAmount += balance.amount;
-    });
+    const formatAmount = (amount: number): string => {
+        return amount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+    };
 
     return {
         pageOrientation: 'landscape',
@@ -29,7 +32,7 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
             showDate: true,
         }),
         footer: footerSection,
-        pageMargins: [ 40, 100, 40, 60 ],
+        pageMargins: [ 50, 200, 50, 60 ],
         content: [
             {
                 layout: 'customLayout',
@@ -51,15 +54,21 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                                 bold: true,
                             }
                         ],
-                        ...customerBalance.map((balance) => [
-                            { text: balance.customer.fullName, bold: true },
-                            { text: `Q. ${balance.amount.toString()}`},
-                            { text: DateFormatter.getDDMMMMYYYY(balance.createdAt)},
-                        ]),              
+                        ...customerBalance.map((balance) => {
+                            totalAmount += balance.amount;
+                            return [
+                                { text: balance.customer.fullName, bold: true },
+                                { text: `Q. ${formatAmount(balance.amount).toString()}`},
+                                { text: DateFormatter.getDDMMMMYYYY(balance.createdAt)},
+                            ]
+                        }),              
                     ],
                 },
             },
-            //Tabla de totales            
+            {
+                text: '',
+                margin: [ 0, 15 ],
+            },        
             {
                 text: 'Totales',
                 style: {
@@ -79,7 +88,7 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                                 bold: true,
                             },
                             {
-                                text: `Q. ${totalAmount.toFixed(2)}`,
+                                text: `Q. ${formatAmount(totalAmount)}`,
                                 bold: true
                             }
                         ]

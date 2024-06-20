@@ -14,13 +14,16 @@ export class ReportService{
     async allCustomerBalance() {
         const customerBalance = await this.prismaService.accountCutOff.findMany({
             where: {
-                
+                isActive: true,
             },
             include: {
                 customer: true,
             },
-            
-            
+            orderBy: {
+                customer: {
+                    fullName: 'asc',
+                },
+            },
         });
 
         const docDefinition = getCustomerBalanceReport({customerBalance: customerBalance});

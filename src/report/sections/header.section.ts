@@ -35,7 +35,7 @@ export const headerSection = (options: HeaderOptions): Content => {
         alignment: 'center',
         margin: [0, 2, 0, 0],
         style: {
-            fontSize: 18,
+            fontSize: 17,
             bold: true,
         },
     } : null;
@@ -57,6 +57,7 @@ export const headerSection = (options: HeaderOptions): Content => {
     } : null;
 
     return {
+        margin: [ 50, 20, 50, 20 ],
         columns: [
             headerLogo,
             headerTitle,
