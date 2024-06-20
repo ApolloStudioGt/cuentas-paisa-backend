@@ -57,7 +57,7 @@ export const headerSection = (options: HeaderOptions): Content => {
     } : null;
 
     return {
-        margin: [ 50, 20, 50, 20 ],
+        margin: [ 50, 35, 50, 10 ],
         columns: [
             headerLogo,
             headerTitle,

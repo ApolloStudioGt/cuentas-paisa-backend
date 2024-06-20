@@ -30,7 +30,7 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
             showDate: true,
         }),
         footer: footerSection,
-        pageMargins: [ 50, 200, 50, 60 ],
+        pageMargins: [ 50, 150, 50, 60 ],
         content: [
             {
                 layout: 'customLayout',
@@ -48,7 +48,7 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                                 bold: true,
                             },
                             {
-                                text: 'FECHA',
+                                text: 'FECHA DE CORTE',
                                 bold: true,
                             }
                         ],
@@ -57,7 +57,7 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                             return [
                                 { text: balance.customer.fullName, bold: true },
                                 { text: `Q. ${formatAmount(balance.amount).toString()}`},
-                                { text: DateFormatter.getDDMMMMYYYY(balance.createdAt)},
+                                { text: DateFormatter.getDDMMMMYYYY(balance.updatedAt)},
                             ]
                         }),              
                     ],
