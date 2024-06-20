@@ -5,14 +5,12 @@ import { AccountCutOff, Customer } from "@prisma/client";
 import { DateFormatter } from "../helpers";
 
 interface ReportOptions {
-    title?: string;
-    subTitle?: string;
     customerBalance: (AccountCutOff & {customer: Customer})[];
 }
 
 export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefinitions => {
 
-    const { title, subTitle, customerBalance } = options;
+    const { customerBalance } = options;
 
     let totalAmount = 0;
 
@@ -26,8 +24,8 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
     return {
         pageOrientation: 'landscape',
         header: headerSection({
-            title: title ?? 'Cuentas Por Cobrar',
-            subTitle: subTitle ?? 'PAISA BOMBAS',
+            title: 'CUENTAS POR COBRAR',
+            subTitle: 'PAISA BOMBAS',
             showLogo: true,
             showDate: true,
         }),
@@ -42,15 +40,15 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                     body: [
                         [
                             {
-                                text: 'Cliente',
+                                text: 'CLIENTE',
                                 bold: true,
                             },
                             {
-                                text: 'Saldo Pendiente',
+                                text: 'SALDO PENDIENTE',
                                 bold: true,
                             },
                             {
-                                text: 'Fecha',
+                                text: 'FECHA',
                                 bold: true,
                             }
                         ],
@@ -70,7 +68,7 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                 margin: [ 0, 15 ],
             },        
             {
-                text: 'Totales',
+                text: 'TOTAL',
                 style: {
                     fontSize: 16,
                     bold: true,
@@ -84,14 +82,10 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                     body: [
                         [
                             {
-                                text: 'Total saldo por cobrar',
+                                text: `Saldo por cobrar: Q. ${formatAmount(totalAmount)}`,
                                 bold: true,
                             },
-                            {
-                                text: `Q. ${formatAmount(totalAmount)}`,
-                                bold: true
-                            }
-                        ]
+                        ],
                     ],
                 },
             },
