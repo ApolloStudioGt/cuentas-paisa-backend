@@ -17,11 +17,6 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 export class SaleController {
   constructor(private readonly salesService: SaleService) {}
 
-  @Post()
-  create(@Body() createSaleDto: CreateSaleDto) {
-    return this.salesService.create(createSaleDto);
-  }
-
   @Get()
   findAll() {
     return this.salesService.findAll();
@@ -30,6 +25,11 @@ export class SaleController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.salesService.findOne(id);
+  }
+
+  @Post()
+  create(@Body() createSaleDto: CreateSaleDto) {
+    return this.salesService.create(createSaleDto);
   }
 
   @Patch(':id')

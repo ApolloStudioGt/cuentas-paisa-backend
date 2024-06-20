@@ -7,6 +7,8 @@ import { AccountCutOffModule } from './account-cut-off/account-cut-off.module';
 import { AuthModule } from './auth/auth.module';
 import { FirebaseAdmin } from './config/firebase.setup';
 import { PrismaModule } from './prisma/prisma.module';
+import { ReportModule } from './report/report.module';
+import { PrinterModule } from './printer/printer.module';
 
 @Module({
   imports: [
@@ -17,6 +19,8 @@ import { PrismaModule } from './prisma/prisma.module';
     SaleTypeModule,
     AccountCutOffModule,
     PrismaModule,
+    ReportModule,
+    PrinterModule,
   ],
   providers: [FirebaseAdmin],
 })
