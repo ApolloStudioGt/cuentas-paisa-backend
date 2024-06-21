@@ -11,18 +11,8 @@ export class CreatePaymentDto {
   @IsNumber()
   amount: number;
 
-  @ApiProperty({ description: 'Payment transaction created by user id' })
+  @ApiProperty({ description: 'Payment transaction sale id' })
   @IsNotEmpty()
   @IsUUID()
-  userId: string;
-
-  @ApiProperty({ description: 'Payment transaction customer id' })
-  @IsNotEmpty()
-  @IsUUID()
-  customerId: string;
-
-  @ApiProperty({ description: 'Payment transaction type id' })
-  @IsNotEmpty()
-  @IsUUID()
-  saleTypeId: string;
+  salesId: string;
 }

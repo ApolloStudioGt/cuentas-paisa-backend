@@ -31,6 +31,7 @@ model Customer {
   nit       String   @unique
   email     String
   phone     String
+
   customerSales Sale[]
   customerAccountCutOff AccountCutOff[]
   isActive  Boolean  @default(true)
@@ -44,12 +45,13 @@ model Sale {
   id          String   @id @default(uuid())
   description String 
   amount      Float
-  createBy  User     @relation(fields: [userId], references: [id])
-  userId    String
-  customer  Customer     @relation(fields: [customerId], references: [id])
-  customerId    String
-  saleType  SaleType     @relation(fields: [saleTypeId], references: [id])
-  saleTypeId    String
+  paid        Boolean @default(false)
+  createBy    User     @relation(fields: [userId], references: [id])
+  userId      String
+  customer    Customer     @relation(fields: [customerId], references: [id])
+  customerId  String
+  saleType    SaleType     @relation(fields: [saleTypeId], references: [id])
+  saleTypeId  String
 
   salePayments Payment[]
   isActive    Boolean  @default(true)
