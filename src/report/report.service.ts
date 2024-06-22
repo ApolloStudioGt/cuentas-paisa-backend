@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrinterService } from 'src/printer/printer.service';
 import { getCustomerBalanceReport } from './definitions';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -12,19 +12,39 @@ export class ReportService{
     }
 
     async allCustomerBalance() {
-        const customerBalance = await this.prismaService.accountCutOff.findMany({
+
+        let customerBalance = [];
+
+        const latestCut = await this.prismaService.accountCutOff.findFirst({
             where: {
                 isActive: true,
             },
-            include: {
-                customer: true,
-            },
             orderBy: {
-                customer: {
-                    fullName: 'asc',
-                },
+                createdAt: 'desc',
             },
         });
+        
+        if (latestCut) {
+            const lastCutDate = new Date(latestCut.createdAt).toISOString().split('T')[0];
+            customerBalance = await this.prismaService.accountCutOff.findMany({
+                where: {
+                    isActive: true,
+                    createdAt: {
+                        gte: new Date(`${lastCutDate}T00:00:00Z`),
+                        lte: new Date(`${lastCutDate}T23:59:59.999Z`),
+                    },
+                },
+                orderBy: {
+                    customer: {
+                        fullName: 'asc',
+                    },
+                },
+                distinct: ['customerId'],
+                include: {
+                    customer: true,
+                },
+            });
+        }
 
         const docDefinition = getCustomerBalanceReport({customerBalance: customerBalance});
         return this.printerService.createPdf(docDefinition);

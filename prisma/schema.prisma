@@ -15,85 +15,103 @@ datasource db {
 
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  fullName  String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  sales Sale[]
+  id                String    @id @default(uuid())
+  email             String    @unique
+  fullName          String
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  sales           Sale[]
+
   @@index([isActive])
 }
 
 model Customer {
-  id        String   @id @default(uuid())
-  fullName  String
-  nit       String   @unique
-  email     String
-  phone     String
+  id                String    @id @default(uuid())
+  fullName          String
+  nit               String    @unique
+  email             String
+  phone             String
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  customerSales Sale[]
+  customerSales   Sale[]
   customerAccountCutOff AccountCutOff[]
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
+
   @@index([isActive])
 }
 
 model Sale {
-  id          String   @id @default(uuid())
-  description String 
-  amount      Float
-  paid        Boolean @default(false)
-  createBy    User     @relation(fields: [userId], references: [id])
-  userId      String
-  customer    Customer     @relation(fields: [customerId], references: [id])
-  customerId  String
-  saleType    SaleType     @relation(fields: [saleTypeId], references: [id])
-  saleTypeId  String
-
-  salePayments Payment[]
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String    @id @default(uuid())
+  docReference      String
+  description       String 
+  amount            Float
+  paid              Boolean   @default(false)
+  createBy          User      @relation(fields: [userId], references: [id])
+  userId            String
+  customer          Customer  @relation(fields: [customerId], references: [id])
+  customerId        String
+  saleType          SaleType  @relation(fields: [saleTypeId], references: [id])
+  saleTypeId        String
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  salePayments      Payment[]
   
   @@index([isActive])
 }
 
 model Payment{
-  id          String   @id @default(uuid())
-  description String 
-  amount      Float
-  sale  Sale?     @relation(fields: [salesId], references: [id])
-  salesId    String? 
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String    @id @default(uuid())
+  docReference      String
+  description       String 
+  amount            Float
+  sale              Sale?     @relation(fields: [salesId], references: [id])
+  salesId           String?
+  bank              Bank?     @relation(fields: [bankId], references: [id])
+  bankId            String?
+  docAuthorization  String?
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   
   @@index([isActive])
 }
 
 model AccountCutOff{
-  id          String   @id @default(uuid())
-  description String 
-  amount      Float
-  customer  Customer     @relation(fields: [customerId], references: [id])
-  customerId    String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                String    @id @default(uuid())
+  description       String 
+  amount            Float
+  customer          Customer  @relation(fields: [customerId], references: [id])
+  customerId        String
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   
   @@index([isActive])
 }
 
 model SaleType{
-  id          String   @id @default(uuid())
-  description String  @unique
-  Sale  Sale[] 
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
+  id                String    @id @default(uuid())
+  description       String    @unique
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  Sale  Sale[]
+
+  @@index([isActive])
+}
+
+model Bank {
+  id                String    @id @default(uuid())
+  description       String    @unique
+  isActive          Boolean   @default(true)
+
+  bankPayments      Payment[]
+
   @@index([isActive])
 }
