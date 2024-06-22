@@ -34,7 +34,17 @@ async function main() {
     },
   });
 
-  console.log({ saleTypeSale, saleTypeWork, adminUser });
+  const bankIndustrial = await prisma.bank.upsert({
+    where: {
+      description: 'Banco Industrial',
+    },
+    update: {},
+    create: {
+      description: 'Banco Industrial'
+    }
+  })
+
+  console.log({ saleTypeSale, saleTypeWork, adminUser, bankIndustrial });
 }
 
 main()

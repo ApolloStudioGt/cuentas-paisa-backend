@@ -1,6 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
 export class CreatePaymentDto {
+  @ApiProperty({ description: 'Payment transaction document reference' })
+  @IsNotEmpty()
+  @IsString()
+  docReference: string;
+  
   @ApiProperty({ description: 'Payment transaction description' })
   @IsNotEmpty()
   @IsString()
@@ -11,18 +16,18 @@ export class CreatePaymentDto {
   @IsNumber()
   amount: number;
 
-  @ApiProperty({ description: 'Payment transaction created by user id' })
+  @ApiProperty({ description: 'Payment transaction sale id' })
   @IsNotEmpty()
   @IsUUID()
-  userId: string;
+  salesId: string;
 
-  @ApiProperty({ description: 'Payment transaction customer id' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'Payment transaction bank id' })
+  @IsOptional()
   @IsUUID()
-  customerId: string;
+  bankId?: string;
 
-  @ApiProperty({ description: 'Payment transaction type id' })
-  @IsNotEmpty()
-  @IsUUID()
-  saleTypeId: string;
+  @ApiProperty({ description: 'Payment transaction authorization document' })
+  @IsOptional()
+  @IsString()
+  docAuthorization?: string;
 }

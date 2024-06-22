@@ -57,7 +57,7 @@ export const getCustomerBalanceReport = (options: ReportOptions): TDocumentDefin
                             return [
                                 { text: balance.customer.fullName, bold: true },
                                 { text: `Q. ${formatAmount(balance.amount).toString()}`},
-                                { text: DateFormatter.getDDMMMMYYYY(balance.updatedAt)},
+                                { text: DateFormatter.getDDMMMMYYYY(balance.createdAt)},
                             ]
                         }),              
                     ],
