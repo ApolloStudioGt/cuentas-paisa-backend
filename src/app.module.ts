@@ -9,18 +9,20 @@ import { FirebaseAdmin } from './config/firebase.setup';
 import { PrismaModule } from './prisma/prisma.module';
 import { ReportModule } from './report/report.module';
 import { PrinterModule } from './printer/printer.module';
+import { BankModule } from './bank/bank.module';
 
 @Module({
   imports: [
     AuthModule,
-    CustomerModule,
-    SalesModule,
-    PaymentModule,
-    SaleTypeModule,
     AccountCutOffModule,
+    BankModule,
+    CustomerModule,
+    PaymentModule,
+    PrinterModule,
     PrismaModule,
     ReportModule,
-    PrinterModule,
+    SaleTypeModule,
+    SalesModule,
   ],
   providers: [FirebaseAdmin],
 })
