@@ -3,7 +3,6 @@ import { Customer } from '@prisma/client';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { CustomerBalanceDto } from './dto/customer-balance.dto';
 
 @Injectable()
 export class CustomerService {
