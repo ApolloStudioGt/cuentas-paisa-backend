@@ -32,6 +32,11 @@ export class CustomerController {
     return this.customerService.findAllActive();
   }
 
+  @Get('detail')
+  async findAllCustomerBalance(): Promise<any[]> {
+    return this.customerService.findAllCustomerBalance();
+  }
+
   @Post()
   create(@Body() createCustomerDto: CreateCustomerDto) {
     return this.customerService.create(createCustomerDto);

@@ -3,6 +3,7 @@ import { Customer } from '@prisma/client';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { CustomerBalanceDto } from './dto/customer-balance.dto';
 
 @Injectable()
 export class CustomerService {
@@ -16,6 +17,49 @@ export class CustomerService {
       where: { isActive: true },
     });
   }
+    
+  async findAllCustomerBalance(): Promise<any[]> {
+    const customers = await this.prismaService.customer.findMany({
+      include: {
+        sales: {
+          where: {
+            paid: false,
+          },
+          include: {
+            payments: {
+              where: {
+                createdAt: {
+                  gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+    
+
+    const customersDebt = customers.map(customer => {
+      let totalDebt = 0;
+
+      customer.sales.forEach(sale => {
+        const totalPayments = sale.payments.reduce((total, payment) => total + payment.amount, 0);
+        const currentDebt = sale.amount - totalPayments;
+        totalDebt += currentDebt;
+      });
+
+      return{
+        id: customer.id,
+        fullName: customer.fullName,
+        nit: customer.nit,
+        email: customer.email,
+        phone: customer.phone,
+        currentDebt: totalDebt,
+      };
+    });
+    return customersDebt;
+  }
+  
 
   async create(
     createcustomerDto: CreateCustomerDto,
