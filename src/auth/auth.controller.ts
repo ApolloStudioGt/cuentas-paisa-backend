@@ -4,7 +4,10 @@ import { SingUpDto } from './dto/singUp.dto';
 import { UserService } from './user/user.service';
 import { SignInDto } from './dto/singIn.dto';
 import { PublicApi } from '../common/decorators/public-api.decorator';
+import { ApiTags } from '@nestjs/swagger';
+
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
