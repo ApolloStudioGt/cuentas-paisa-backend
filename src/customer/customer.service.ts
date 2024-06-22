@@ -17,8 +17,8 @@ export class CustomerService {
       where: { isActive: true },
     });
   }
-    
-  async findAllCustomerBalance(): Promise<any[]> {
+
+  async findAllCurrentDebt(): Promise<any[]> {
     const customers = await this.prismaService.customer.findMany({
       include: {
         sales: {

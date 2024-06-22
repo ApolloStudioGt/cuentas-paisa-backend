@@ -33,8 +33,8 @@ export class CustomerController {
   }
 
   @Get('detail')
-  async findAllCustomerBalance(): Promise<any[]> {
-    return this.customerService.findAllCustomerBalance();
+  async findAllCurrentDebt(): Promise<any[]> {
+    return this.customerService.findAllCurrentDebt();
   }
 
   @Post()
