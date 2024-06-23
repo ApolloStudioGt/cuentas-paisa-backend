@@ -14,24 +14,24 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
-  @Get('user/:email')
-  async find(@Param('email') email: string) {
-    return this.userService.findOne(email);
-  }
-
   @Get('user')
   async findAll() {
     return this.userService.findAll();
   }
 
-  @Post('singup')
-  async create(@Body() singUpDto: SingUpDto) {
-    return this.authService.create(singUpDto);
+  @Get('user/:email')
+  async find(@Param('email') email: string) {
+    return this.userService.findOne(email);
   }
 
   @PublicApi()
   @Post('login')
   async login(@Body() signInDto: SignInDto) {
     return this.authService.login(signInDto);
+  }
+
+  @Post('singup')
+  async create(@Body() singUpDto: SingUpDto) {
+    return this.authService.create(singUpDto);
   }
 }

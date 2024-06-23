@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { SaleType } from '@prisma/client';
 
 @Injectable()
 export class SaleTypeService {
@@ -11,7 +12,16 @@ export class SaleTypeService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} saleType`;
+  async findOne(id: string): Promise<SaleType | string> {
+    const saleType = await this.prismaService.saleType.findUnique({
+      where: {
+        id, isActive: true
+      }
+    });
+
+    if (!saleType) {
+      throw new NotFoundException(`Tipo de venta no encontrado`);
+    }
+    return saleType;
   }
 }

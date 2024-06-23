@@ -16,6 +16,6 @@ export class SaleTypeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.saleTypeService.findOne(+id);
+    return this.saleTypeService.findOne(id);
   }
 }

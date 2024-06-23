@@ -18,6 +18,23 @@ export class AuthService {
     private readonly admin: FirebaseAdmin,
   ) {}
 
+  async login(signInDto: SignInDto) {
+    try {
+      const auth = getAuth();
+      const { email, password } = signInDto;
+
+      return await signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential: UserCredential) => {
+          return userCredential;
+        })
+        .catch((error) => {
+          throw new BadRequestException(error.message);
+        });
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
   async create(singUpDto: SingUpDto): Promise<UserRecord> {
     const { email, password, fullName } = singUpDto;
     const app = this.admin.setup();
@@ -33,23 +50,6 @@ export class AuthService {
       await app.auth().setCustomUserClaims(createdUser.uid, { Role: 'seller' });
       await this.usersService.create({ email, fullName, id: userUuid });
       return createdUser;
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  async login(signInDto: SignInDto) {
-    try {
-      const auth = getAuth();
-      const { email, password } = signInDto;
-
-      return await signInWithEmailAndPassword(auth, email, password)
-        .then((userCredential: UserCredential) => {
-          return userCredential;
-        })
-        .catch((error) => {
-          throw new BadRequestException(error.message);
-        });
     } catch (error) {
       throw new BadRequestException(error.message);
     }
