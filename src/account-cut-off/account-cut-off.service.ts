@@ -13,7 +13,7 @@ export class AccountCutOffService {
     });
   }
 
-  async findOne(id: string): Promise<AccountCutOff | string>{
+  async findOne(id: string): Promise<AccountCutOff | string> {
     const accountCutOff = await this.prismaService.accountCutOff.findUnique({
       where: { id, isActive: true },
     });
@@ -23,7 +23,11 @@ export class AccountCutOffService {
     return accountCutOff;
   }
 
-  async create(createAccountCutOffDto: CreateAccountCutOffDto): Promise<AccountCutOff> {
-    return this.prismaService.accountCutOff.create({ data: createAccountCutOffDto });
+  async create(
+    createAccountCutOffDto: CreateAccountCutOffDto,
+  ): Promise<AccountCutOff> {
+    return this.prismaService.accountCutOff.create({
+      data: createAccountCutOffDto,
+    });
   }
 }

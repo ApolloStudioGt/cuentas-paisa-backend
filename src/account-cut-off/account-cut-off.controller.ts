@@ -3,7 +3,6 @@ import { AccountCutOffService } from './account-cut-off.service';
 import { CreateAccountCutOffDto } from './dto/create-account-cut-off.dto';
 import { ApiTags } from '@nestjs/swagger';
 
-
 @Controller('account-cut-off')
 @ApiTags('account-cut-off')
 export class AccountCutOffController {

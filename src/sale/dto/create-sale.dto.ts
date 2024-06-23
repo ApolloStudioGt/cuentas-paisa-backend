@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, IsUUID, } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
 
 export class CreateSaleDto {
-  @ApiProperty({ description: 'Sale transaction reference document '})
+  @ApiProperty({ description: 'Sale transaction reference document ' })
   @IsNotEmpty()
   @IsString()
   docReference: string;
