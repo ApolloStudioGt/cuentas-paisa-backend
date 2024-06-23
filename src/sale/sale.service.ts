@@ -8,14 +8,24 @@ import { Sale } from '@prisma/client';
 export class SaleService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(createSaleDto: CreateSaleDto): Promise<Sale> {
-    return this.prismaService.sale.create({ data: createSaleDto });
-  }
-
   async findAll(): Promise<Sale[]> {
     return await this.prismaService.sale.findMany({
       where: { isActive: true },
     });
+  }
+
+  async totalSalesAmount(): Promise<{ amount: number }> {
+    const total = await this.prismaService.sale.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        isActive: true,
+      },
+    });
+    return {
+      amount: total._sum.amount || 0
+    }
   }
 
   async findOne(id: string): Promise<Sale | string> {
@@ -26,6 +36,10 @@ export class SaleService {
     if (!sale)
       throw new NotFoundException(`Transaction with id ${id} not found`);
     return sale;
+  }
+  
+  async create(createSaleDto: CreateSaleDto): Promise<Sale> {
+    return this.prismaService.sale.create({ data: createSaleDto });
   }
 
   async update(id: string, updateSaleDto: UpdateSaleDto): Promise<Sale> {

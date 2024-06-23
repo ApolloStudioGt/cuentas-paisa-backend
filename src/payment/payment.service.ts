@@ -8,6 +8,36 @@ import { PrismaService } from '../prisma/prisma.service';
 export class PaymentService {
   constructor(private readonly prismaService: PrismaService) {}
   
+  async findAll(): Promise<Payment[]> {
+    return await this.prismaService.payment.findMany({
+      where: { isActive: true },
+    });
+  }
+
+  async totalPaymentsAmount(): Promise<{ amount: number }> {
+    const total = await this.prismaService.payment.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        isActive: true,
+      },
+    });
+    return {
+      amount: total._sum.amount || 0
+    }
+  }
+
+  async findOne(id: string): Promise<Payment | string> {
+    const payment = await this.prismaService.payment.findUnique({
+      where: { id, isActive: true },
+    });
+
+    if (!payment)
+      throw new NotFoundException(`Transaction with id  ${id} not found`);
+    return payment;
+  }
+
   async create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
 
     //Verificar si la venta ya fue saldada
@@ -64,22 +94,6 @@ export class PaymentService {
     }
 
     return await this.prismaService.payment.create({ data: createPaymentDto });
-  }
-
-  async findAll(): Promise<Payment[]> {
-    return await this.prismaService.payment.findMany({
-      where: { isActive: true },
-    });
-  }
-
-  async findOne(id: string): Promise<Payment | string> {
-    const payment = await this.prismaService.payment.findUnique({
-      where: { id, isActive: true },
-    });
-
-    if (!payment)
-      throw new NotFoundException(`Transaction with id  ${id} not found`);
-    return payment;
   }
 
   async update(

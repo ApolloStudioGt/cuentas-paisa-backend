@@ -8,6 +8,7 @@ import { GetCustomerDebt } from './interfaces/get-customer-debt';
 @Injectable()
 export class CustomerService {
   constructor(private readonly prismaService: PrismaService) {}
+
   async findAll(): Promise<Customer[]> {
     return await this.prismaService.customer.findMany();
   }
@@ -63,6 +64,23 @@ export class CustomerService {
     return customersDebt;
   }
 
+  async findAllRegistered(): Promise<{ registered: number }> {
+    const count = await this.prismaService.customer.count();
+    return { 
+      registered: count
+    };
+  }
+
+  async findOne(id: string): Promise<Customer | string> {
+    const customer = await this.prismaService.customer.findFirst({
+      where: { id, isActive: true },
+    });
+
+    if (!customer)
+      throw new NotFoundException(`Customer with id ${id} not found`);
+    return customer;
+  }
+
   async create(
     createcustomerDto: CreateCustomerDto,
   ): Promise<Customer | string> {
@@ -77,16 +95,6 @@ export class CustomerService {
     return await this.prismaService.customer.create({
       data: createcustomerDto,
     });
-  }
-
-  async findOne(id: string): Promise<Customer | string> {
-    const customer = await this.prismaService.customer.findFirst({
-      where: { id, isActive: true },
-    });
-
-    if (!customer)
-      throw new NotFoundException(`Customer with id ${id} not found`);
-    return customer;
   }
 
   async update(

@@ -22,11 +22,6 @@ export class CustomerController {
     return this.customerService.findAll();
   }
 
-  @Get('id/:id')
-  findOne(@Param('id') id: string) {
-    return this.customerService.findOne(id);
-  }
-
   @Get('active')
   findAllActive() {
     return this.customerService.findAllActive();
@@ -35,6 +30,16 @@ export class CustomerController {
   @Get('detail')
   async findAllCurrentDebt(): Promise<any[]> {
     return this.customerService.findAllCurrentDebt();
+  }
+
+  @Get('registered')
+  async findAllRegistered(): Promise< {registered: number} > {
+    return this.customerService.findAllRegistered();
+  }
+
+  @Get('id/:id')
+  findOne(@Param('id') id: string) {
+    return this.customerService.findOne(id);
   }
 
   @Post()

@@ -6,6 +6,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async findAll(): Promise<User[]> {
+    return await this.prismaService.user.findMany({
+      where: { isActive: true },
+    });
+  }
+
   async findOne(email: string): Promise<User> {
     const user: User = await this.prismaService.user.findUnique({
       where: { email, isActive: true },
@@ -16,12 +23,6 @@ export class UserService {
     } else {
       throw new NotFoundException('User not found');
     }
-  }
-
-  async findAll(): Promise<User[]> {
-    return await this.prismaService.user.findMany({
-      where: { isActive: true },
-    });
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

@@ -22,6 +22,11 @@ export class SaleController {
     return this.salesService.findAll();
   }
 
+  @Get('total')
+  async totalSalesAmount(): Promise<{ amount: number }> {
+    return await this.salesService.totalSalesAmount();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.salesService.findOne(id);

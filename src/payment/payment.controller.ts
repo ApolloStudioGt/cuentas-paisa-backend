@@ -22,6 +22,11 @@ export class PaymentController {
     return this.paymentService.findAll();
   }
 
+  @Get('total')
+  async totalPaymentsAmount(): Promise<{ amount: number }> {
+    return await this.paymentService.totalPaymentsAmount();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.paymentService.findOne(id);
