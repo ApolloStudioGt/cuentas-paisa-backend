@@ -10,6 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ReportModule } from './report/report.module';
 import { PrinterModule } from './printer/printer.module';
 import { BankModule } from './bank/bank.module';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -17,12 +18,14 @@ import { BankModule } from './bank/bank.module';
     AccountCutOffModule,
     BankModule,
     CustomerModule,
+    DashboardModule,
     PaymentModule,
     PrinterModule,
     PrismaModule,
     ReportModule,
     SaleTypeModule,
     SalesModule,
+    
   ],
   providers: [FirebaseAdmin],
 })

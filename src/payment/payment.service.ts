@@ -20,20 +20,6 @@ export class PaymentService {
     });
   }
 
-  async totalPaymentsAmount(): Promise<{ amount: number }> {
-    const total = await this.prismaService.payment.aggregate({
-      _sum: {
-        amount: true,
-      },
-      where: {
-        isActive: true,
-      },
-    });
-    return {
-      amount: total._sum.amount || 0,
-    };
-  }
-
   async findOne(id: string): Promise<Payment | string> {
     const payment = await this.prismaService.payment.findUnique({
       where: { id, isActive: true },
