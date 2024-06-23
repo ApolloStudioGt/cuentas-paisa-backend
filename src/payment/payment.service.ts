@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from '@prisma/client';
@@ -25,6 +25,14 @@ export class PaymentService {
       throw new ConflictException(`La venta de: ${sale.description} ya se encuentra saldada.`);
     }
 
+    //Si se selecciona banco que se ingrese documento autorización y visceversa
+    if (createPaymentDto.bankId && !createPaymentDto.docAuthorization) {
+      throw new BadRequestException(`Ingrese número de autorización.`);
+    }
+    else if  (createPaymentDto.docAuthorization && !createPaymentDto.bankId) {
+      throw new BadRequestException(`Ingrese banco donde fue realizado el depósito.`);
+    }
+
     //Sumatoria de pagos realizados a la venta
     const totalPayments = await this.prismaService.payment.aggregate({
       where: { 
@@ -40,7 +48,7 @@ export class PaymentService {
 
     //Validar sumatoria de pagos contra monto de la venta
     if (createPaymentDto.amount + totalPaid > saleAmount ) {
-      throw new BadRequestException(`El pago a registrar excede el monto pendiente de la venta.`);
+      throw new NotAcceptableException(`El pago a registrar excede el monto pendiente de la venta.`);
     }
 
     //Actualizar valor de paid a true (saldado)
