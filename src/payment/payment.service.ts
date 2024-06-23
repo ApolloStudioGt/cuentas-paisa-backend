@@ -1,4 +1,10 @@
-import { BadRequestException, ConflictException, HttpException, HttpStatus, Injectable, NotAcceptableException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { Payment } from '@prisma/client';
@@ -7,7 +13,7 @@ import { PrismaService } from '../prisma/prisma.service';
 @Injectable()
 export class PaymentService {
   constructor(private readonly prismaService: PrismaService) {}
-  
+
   async findAll(): Promise<Payment[]> {
     return await this.prismaService.payment.findMany({
       where: { isActive: true },
@@ -24,8 +30,8 @@ export class PaymentService {
       },
     });
     return {
-      amount: total._sum.amount || 0
-    }
+      amount: total._sum.amount || 0,
+    };
   }
 
   async findOne(id: string): Promise<Payment | string> {
@@ -39,12 +45,11 @@ export class PaymentService {
   }
 
   async create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
-
     //Verificar si la venta ya fue saldada
     const sale = await this.prismaService.sale.findUnique({
       where: {
         id: createPaymentDto.salesId,
-      }
+      },
     });
 
     if (!sale) {
@@ -52,43 +57,48 @@ export class PaymentService {
     }
 
     if (sale.paid) {
-      throw new ConflictException(`La venta de: ${sale.description} ya se encuentra saldada.`);
+      throw new ConflictException(
+        `La venta de: ${sale.description} ya se encuentra saldada.`,
+      );
     }
 
     //Si se selecciona banco que se ingrese documento autorización y visceversa
     if (createPaymentDto.bankId && !createPaymentDto.docAuthorization) {
       throw new BadRequestException(`Ingrese número de autorización.`);
-    }
-    else if  (createPaymentDto.docAuthorization && !createPaymentDto.bankId) {
-      throw new BadRequestException(`Ingrese banco donde fue realizado el depósito.`);
+    } else if (createPaymentDto.docAuthorization && !createPaymentDto.bankId) {
+      throw new BadRequestException(
+        `Ingrese banco donde fue realizado el depósito.`,
+      );
     }
 
     //Sumatoria de pagos realizados a la venta
     const totalPayments = await this.prismaService.payment.aggregate({
-      where: { 
-        salesId: createPaymentDto.salesId 
+      where: {
+        salesId: createPaymentDto.salesId,
       },
       _sum: {
-        amount: true
-      }
+        amount: true,
+      },
     });
 
     const totalPaid = totalPayments._sum.amount || 0;
     const saleAmount = sale.amount;
 
     //Validar sumatoria de pagos contra monto de la venta
-    if (createPaymentDto.amount + totalPaid > saleAmount ) {
-      throw new NotAcceptableException(`El pago a registrar excede el monto pendiente de la venta.`);
+    if (createPaymentDto.amount + totalPaid > saleAmount) {
+      throw new NotAcceptableException(
+        `El pago a registrar excede el monto pendiente de la venta.`,
+      );
     }
 
     //Actualizar valor de paid a true (saldado)
     if (createPaymentDto.amount + totalPaid === saleAmount) {
       await this.prismaService.sale.update({
         where: {
-          id: createPaymentDto.salesId
+          id: createPaymentDto.salesId,
         },
         data: {
-          paid: true
+          paid: true,
         },
       });
     }

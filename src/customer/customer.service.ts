@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Customer } from '@prisma/client';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -89,7 +93,9 @@ export class CustomerService {
     });
 
     if (existingCustomer) {
-      return `The customer with the NIT ${existingCustomer.nit} already exists`;
+      throw new BadRequestException(
+        `The customer with the NIT ${existingCustomer.nit} already exists`,
+      );
     }
 
     return await this.prismaService.customer.create({
