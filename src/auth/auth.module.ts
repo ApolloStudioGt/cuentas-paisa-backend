@@ -7,7 +7,6 @@ import { RolesGuard } from './guards/roles.guard';
 import { UserIdGuard } from './guards/user-id.guard';
 import { FirebaseAdmin } from '../config/firebase.setup';
 
-
 @Module({
   controllers: [AuthController],
   providers: [

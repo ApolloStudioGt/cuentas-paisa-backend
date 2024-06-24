@@ -15,8 +15,9 @@ export class SaleTypeService {
   async findOne(id: string): Promise<SaleType | string> {
     const saleType = await this.prismaService.saleType.findUnique({
       where: {
-        id, isActive: true
-      }
+        id,
+        isActive: true,
+      },
     });
 
     if (!saleType) {

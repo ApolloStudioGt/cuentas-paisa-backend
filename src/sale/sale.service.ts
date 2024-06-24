@@ -23,7 +23,7 @@ export class SaleService {
       throw new NotFoundException(`Transaction with id ${id} not found`);
     return sale;
   }
-  
+
   async create(createSaleDto: CreateSaleDto): Promise<Sale> {
     return this.prismaService.sale.create({ data: createSaleDto });
   }

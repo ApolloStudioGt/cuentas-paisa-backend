@@ -12,13 +12,11 @@ import { SaleService } from './sale.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserIdGuard } from 'src/auth/guards/user-id.guard';
 
 @Controller('sale')
 @ApiTags('sale')
 export class SaleController {
-
   constructor(private readonly salesService: SaleService) {}
 
   @Get()
