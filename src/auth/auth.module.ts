@@ -4,7 +4,9 @@ import { AuthController } from './auth.controller';
 import { UserModule } from './user/user.module';
 import { AuthGuard } from './guards/auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { UserIdGuard } from './guards/user-id.guard';
 import { FirebaseAdmin } from '../config/firebase.setup';
+
 
 @Module({
   controllers: [AuthController],
@@ -18,6 +20,10 @@ import { FirebaseAdmin } from '../config/firebase.setup';
     {
       provide: 'APP_GUARD',
       useClass: RolesGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: UserIdGuard,
     },
   ],
   imports: [UserModule],
