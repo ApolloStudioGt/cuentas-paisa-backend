@@ -32,11 +32,6 @@ export class CustomerController {
     return this.customerService.findAllCurrentDebt();
   }
 
-  @Get('registered')
-  async findAllRegistered(): Promise< {registered: number} > {
-    return this.customerService.findAllRegistered();
-  }
-
   @Get('id/:id')
   findOne(@Param('id') id: string) {
     return this.customerService.findOne(id);

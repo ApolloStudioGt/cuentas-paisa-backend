@@ -14,20 +14,6 @@ export class SaleService {
     });
   }
 
-  async totalSalesAmount(): Promise<{ amount: number }> {
-    const total = await this.prismaService.sale.aggregate({
-      _sum: {
-        amount: true,
-      },
-      where: {
-        isActive: true,
-      },
-    });
-    return {
-      amount: total._sum.amount || 0
-    }
-  }
-
   async findOne(id: string): Promise<Sale | string> {
     const sale = await this.prismaService.sale.findUnique({
       where: { id, isActive: true },

@@ -68,13 +68,6 @@ export class CustomerService {
     return customersDebt;
   }
 
-  async findAllRegistered(): Promise<{ registered: number }> {
-    const count = await this.prismaService.customer.count();
-    return { 
-      registered: count
-    };
-  }
-
   async findOne(id: string): Promise<Customer | string> {
     const customer = await this.prismaService.customer.findFirst({
       where: { id, isActive: true },
