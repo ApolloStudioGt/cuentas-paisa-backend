@@ -32,7 +32,7 @@ export class SaleController {
   }
 
   @Post()
-  @UseGuards(AuthGuard, UserIdGuard)
+  @UseGuards(UserIdGuard)
   create(@Body() createSaleDto: CreateSaleDto) {
     return this.salesService.create(createSaleDto);
   }
