@@ -150,10 +150,11 @@ export class CustomerService {
   }
 
   async create(
-    createcustomerDto: CreateCustomerDto,
-  ): Promise<Customer | string> {
+    createcustomerDto: CreateCustomerDto): Promise<Customer | string> {
     const existingCustomer = await this.prismaService.customer.findUnique({
-      where: { nit: createcustomerDto.nit },
+      where: { 
+        nit: createcustomerDto.nit
+      },
     });
 
     if (existingCustomer) {
