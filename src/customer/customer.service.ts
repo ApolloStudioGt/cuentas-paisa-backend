@@ -28,9 +28,6 @@ export class CustomerService {
     const customers = await this.prismaService.customer.findMany({
       include: {
         sales: {
-          where: {
-            paid: false,
-          },
           include: {
             payments: {
               where: {
