@@ -5,12 +5,28 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from '../auth.service';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class UserIdGuard implements CanActivate {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private reflector: Reflector,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic = this.reflector.getAllAndOverride<boolean>('isPublic', [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    const endpoint = context.switchToHttp().getRequest().url.toLowerCase();
+    const httpMethod = context.switchToHttp().getRequest().method;
+    const validEndpoint = !(httpMethod === 'POST' && endpoint === '/api/sale');
+    if (isPublic || validEndpoint) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
 

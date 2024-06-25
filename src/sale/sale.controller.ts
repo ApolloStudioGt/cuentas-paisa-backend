@@ -6,13 +6,11 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
 } from '@nestjs/common';
 import { SaleService } from './sale.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
-import { UserIdGuard } from 'src/auth/guards/user-id.guard';
 
 @Controller('sale')
 @ApiTags('sale')
@@ -30,7 +28,6 @@ export class SaleController {
   }
 
   @Post()
-  @UseGuards(UserIdGuard)
   create(@Body() createSaleDto: CreateSaleDto) {
     return this.salesService.create(createSaleDto);
   }
