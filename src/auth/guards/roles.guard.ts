@@ -20,6 +20,7 @@ export class RolesGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
     if (isPublic) {
       return true;
     }
@@ -27,6 +28,7 @@ export class RolesGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     const user = await this.authService.decodeUserByToken(token);
+
     if (user['Role'].toLowerCase().includes(Role.Admin)) return true;
 
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>('roles', [
