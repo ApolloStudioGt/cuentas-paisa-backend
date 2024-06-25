@@ -7,6 +7,7 @@ import { Customer } from '@prisma/client';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { GetAllCustomersDebt } from './interfaces/get-all-customers-debt';
 import { GetCustomerDebt } from './interfaces/get-customer-debt';
 
 @Injectable()
@@ -23,7 +24,7 @@ export class CustomerService {
     });
   }
 
-  async findAllCurrentDebt(): Promise<GetCustomerDebt[]> {
+  async findAllCurrentDebt(): Promise<GetAllCustomersDebt[]> {
     const customers = await this.prismaService.customer.findMany({
       include: {
         sales: {
@@ -43,7 +44,7 @@ export class CustomerService {
       },
     });
 
-    const customersDebt: GetCustomerDebt[] = customers.map((customer) => {
+    const customersDebt: GetAllCustomersDebt[] = customers.map((customer) => {
       let totalDebt = 0;
 
       customer.sales.forEach((sale) => {
@@ -66,6 +67,76 @@ export class CustomerService {
       };
     });
     return customersDebt;
+  }
+
+  async findCurrentDebt(id: string): Promise<GetCustomerDebt> {
+    const customer = await this.prismaService.customer.findUnique({
+      where: {
+        id,
+        isActive: true,
+      },
+      include: {
+        sales: {
+          where: {
+            paid: false,
+          },
+          include: {
+            payments: {
+              where: {
+                createdAt: {
+                  gte: new Date(new Date().setHours(0, 0, 0, 0)),
+                },
+              },
+              include: {
+                bank: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Datos del cliente no encontrados');
+    }
+
+    let currentDebt = 0;
+
+    const salesData = customer.sales.map(sale => {
+      const totalPayments = sale.payments.reduce((total, payment) => total + payment.amount, 0);
+      const subtotal = sale.amount - totalPayments;
+      currentDebt += subtotal;
+
+      return {
+        id: sale.id,
+        docReference: sale.docReference,
+        description: sale.description,
+        amount: sale.amount,
+        createdAt: sale.createdAt,
+        subtotal,
+        payments: sale.payments.map(payment => ({
+          id: payment.id,
+          docReference: payment.docReference,
+          description: payment.description,
+          amount: payment.amount,
+          bankDescription: payment.bank ? payment.bank.description || '' : '',
+          docAuthorization: payment.docAuthorization || '',
+          createdAt: payment.createdAt
+        })),
+      };
+    });
+
+    const detailedBalanceCustomer: GetCustomerDebt = {
+      id: customer.id,
+      fullName: customer.fullName,
+      nit: customer.nit,
+      email: customer.email,
+      phone: customer.phone,
+      currentDebt,
+      createdAt: customer.createdAt,
+      sales: salesData,
+    };
+    return detailedBalanceCustomer;
   }
 
   async findOne(id: string): Promise<Customer | string> {
