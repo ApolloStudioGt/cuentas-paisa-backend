@@ -29,34 +29,32 @@ export const headerSection = (options: HeaderOptions): Content => {
   const headerLogo: Content = showLogo ? logo : null;
   const headerDate: Content = showDate ? currentDate : null;
 
-  const headerSubTitle: Content = subTitle
-    ? {
-        text: subTitle,
-        alignment: 'center',
-        margin: [0, 2, 0, 0],
-        style: {
-          fontSize: 17,
-          bold: true,
-        },
-      }
-    : null;
+  const headerSubTitle: Content = subTitle ? {
+    text: subTitle,
+    alignment: 'center',
+    margin: [0, 2, 0, 0],
+    style: {
+      fontSize: 17,
+      bold: true,
+    },
+  }
+  : null;
 
-  const headerTitle: Content = title
-    ? {
-        stack: [
-          {
-            text: title,
-            alignment: 'center',
-            margin: [0, 15, 0, 0],
-            style: {
-              bold: true,
-              fontSize: 20,
-            },
-          },
-          headerSubTitle,
-        ],
-      }
-    : null;
+  const headerTitle: Content = title ? {
+    stack: [
+      {
+        text: title,
+        alignment: 'center',
+        margin: [0, 15, 0, 0],
+        style: {
+          bold: true,
+          fontSize: 20,
+        },
+      },
+      headerSubTitle,
+    ],
+  }
+  : null;
 
   return {
     margin: [50, 35, 50, 10],
