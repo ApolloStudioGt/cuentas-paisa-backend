@@ -6,10 +6,10 @@ import { GetSummaryDashboard } from './interfaces/get-summary-dashboard';
 @Controller('dashboard')
 @ApiTags('dashboard')
 export class DashboardController {
-    constructor(private readonly dashboardService: DashboardService) {}
+  constructor(private readonly dashboardService: DashboardService) {}
 
-    @Get()
-    async summary(): Promise<GetSummaryDashboard>{
-        return this.dashboardService.summary();
-    }
+  @Get()
+  async summary(): Promise<GetSummaryDashboard> {
+    return this.dashboardService.summary();
+  }
 }

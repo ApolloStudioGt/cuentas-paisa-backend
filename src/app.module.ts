@@ -25,7 +25,6 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ReportModule,
     SaleTypeModule,
     SalesModule,
-    
   ],
   providers: [FirebaseAdmin],
 })
