@@ -12,7 +12,6 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { GetAllCustomersDebt } from './interfaces/get-all-customers-debt';
-import { string } from 'joi';
 import { GetCustomerDebt } from './interfaces/get-customer-debt';
 
 @Controller('customer')
