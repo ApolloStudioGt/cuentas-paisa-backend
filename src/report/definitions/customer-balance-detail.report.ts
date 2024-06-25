@@ -2,8 +2,6 @@ import { TDocumentDefinitions } from "pdfmake/interfaces";
 import { CustomerBalanceDetailDto, PaymentDto } from "../dto/detail-customer-balance.dto";
 import { DateFormatter } from "../helpers";
 import { footerSection, headerSection } from "../sections";
-import { text } from "stream/consumers";
-
 
 interface ReportOptions {
     fullName: string;
@@ -192,6 +190,43 @@ export const getCustomerBalanceDetailReport = (
         pageMargins: [50, 150, 50, 60],
         content: [
             {
+                text: 'DATOS DEL CLIENTE',
+                style: {
+                    fontSize: 15,
+                    bold: true,
+                },
+                margin: [0, -15, 0, 0],
+            },
+            {
+                layout: 'noBorders',
+                table: {
+                    headerRows: 1,
+                    body: [
+                        [
+                            {
+                                text: `Nombre: ${fullName}`,
+                            },
+                        ],
+                        [
+                            {
+                                text: `NIT: ${nit}`,
+                            },
+                        ],
+                        [
+                            {
+                                text: `Email: ${email}`,
+                            },
+                        ],
+                        [
+                            {
+                                text: `Teléfono: ${phone}`,
+                                margin: [0, 0, 0, 15],
+                            },
+                        ],
+                    ],
+                },
+            },
+            {
                 layout: 'customLayout',
                 table: {
                     headerRows: 1,
@@ -215,24 +250,34 @@ export const getCustomerBalanceDetailReport = (
                 layout: 'noBorders',
                 table: {
                     headerRows: 1,
+                    widths: ['auto', 'auto'],
                     body: [
                         [
                             {
-                                text: `Ventas: Q. ${formatAmount(totalSalesAmount)}`,
+                                text: 'Ventas: ',
                                 bold: true,
+                            },
+                            {
+                                text: `Q. ${formatAmount(totalSalesAmount)}`
                             },
                         ],
                         [
                             {
-                                text: `Pagos: Q. ${formatAmount(totalPaymentsAmount)}`,
+                                text: 'Pagos: ',
                                 bold: true,
+                            },
+                            {
+                                text: `Q. ${formatAmount(totalPaymentsAmount)}`
                             },
                         ],
                         [
                             {
-                                text: `Pendiente: Q. ${formatAmount(totalAmount)}`,
+                                text: 'Pendiente: ',
                                 bold: true,
                             },
+                            {
+                                text: `Q. ${formatAmount(totalAmount)}`,
+                            }
                         ],
                     ],
                 },
