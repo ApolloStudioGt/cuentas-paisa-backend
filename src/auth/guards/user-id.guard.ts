@@ -22,7 +22,7 @@ export class UserIdGuard implements CanActivate {
 
     const endpoint = context.switchToHttp().getRequest().url.toLowerCase();
     const httpMethod = context.switchToHttp().getRequest().method;
-    const validEndpoint = !(httpMethod === 'POST' && endpoint === '/api/sale');
+    const validEndpoint = !(httpMethod === 'POST' && endpoint === '/sale');
     if (isPublic || validEndpoint) {
       return true;
     }
