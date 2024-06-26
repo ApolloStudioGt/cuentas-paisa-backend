@@ -1,4 +1,4 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
@@ -14,6 +14,16 @@ export class ReportController {
 
     response.setHeader('Content-Type', 'application/pdf');
     pdfDoc.info.Title = 'Saldo_de_Clientes';
+    pdfDoc.pipe(response);
+    pdfDoc.end();
+  }
+
+  @Get('customerbalance/:id')
+  async customerBalanceDetail(@Param('id') id: string, @Res() response: Response) {
+    const pdfDoc = await this.reportService.customerBalanceDetail(id);
+
+    response.setHeader('Content-Type', 'application/pdf');
+    pdfDoc.info.Title = `Detalle_Saldo_Cliente`;
     pdfDoc.pipe(response);
     pdfDoc.end();
   }
