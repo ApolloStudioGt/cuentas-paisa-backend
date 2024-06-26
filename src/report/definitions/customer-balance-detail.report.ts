@@ -157,23 +157,7 @@ export const getCustomerBalanceDetailReport = (
             ];
         });
 
-        const doubleLineRow = [
-            {
-                colSpan: 9,
-                border: [false, false, false, true],
-                text: '',
-            },
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-            {},
-        ];
-
-        return [saleRow, ...paymentRows, doubleLineRow];
+        return [saleRow, ...paymentRows];
     });
 
     const totalAmount = totalSalesAmount - totalPaymentsAmount;
@@ -201,33 +185,50 @@ export const getCustomerBalanceDetailReport = (
                 layout: 'noBorders',
                 table: {
                     headerRows: 1,
+                    widths: ['auto', 'auto'],
                     body: [
                         [
                             {
-                                text: `Nombre: ${fullName}`,
+                                text: 'Nombre: ',
+                                bold: true,
+                            },
+                            {
+                                text: `${fullName}`,
                             },
                         ],
                         [
                             {
-                                text: `NIT: ${nit}`,
+                                text: 'NIT: ',
+                                bold: true,
+                            },
+                            {
+                                text: `${nit}`,
                             },
                         ],
                         [
                             {
-                                text: `Email: ${email}`,
+                                text: 'Email: ',
+                                bold: true,
+                            },
+                            {
+                                text: `${email}`,
                             },
                         ],
                         [
                             {
-                                text: `Teléfono: ${phone}`,
+                                text: 'Teléfono: ',
+                                bold: true,
                                 margin: [0, 0, 0, 15],
+                            },
+                            {
+                                text: `${phone}`,
                             },
                         ],
                     ],
                 },
             },
             {
-                layout: 'customLayout',
+                layout: 'customDetailLayout',
                 table: {
                     headerRows: 1,
                     widths: ['auto', 'auto', 80, 'auto', '*', 80, '*', 80, 80],
