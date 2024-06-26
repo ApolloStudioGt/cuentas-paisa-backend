@@ -18,11 +18,11 @@ export class UserService {
       where: { email, isActive: true },
     });
 
-    if (user) {
-      return user;
-    } else {
+    if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    return user;
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
