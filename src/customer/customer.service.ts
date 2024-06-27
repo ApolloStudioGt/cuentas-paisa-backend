@@ -77,6 +77,9 @@ export class CustomerService {
           where: {
             paid: false,
           },
+          orderBy: {
+            createdAt: 'asc'
+          },
           include: {
             payments: {
               where: {
