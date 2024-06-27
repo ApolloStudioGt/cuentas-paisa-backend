@@ -131,6 +131,7 @@ export class CustomerService {
         docReference: sale.docReference,
         description: sale.description,
         amount: sale.amount,
+        subtotal: saleSubtotal,
         createdAt: sale.createdAt,
         payments: mappedPayments,
       };

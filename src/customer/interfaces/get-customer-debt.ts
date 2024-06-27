@@ -14,6 +14,7 @@ export interface Sale {
     docReference: string;
     description: string;
     amount: number;
+    subtotal: number;
     createdAt: Date;
     payments: Payment[];
 }
