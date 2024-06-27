@@ -8,7 +8,7 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetAllCustomersDebt } from './interfaces/get-all-customers-debt';
-import { GetCustomerDebt } from './interfaces/get-customer-debt';
+import { GetCustomerDebt, Payment, Sale } from './interfaces/get-customer-debt';
 
 @Injectable()
 export class CustomerService {
@@ -31,6 +31,7 @@ export class CustomerService {
           include: {
             payments: {
               where: {
+                isActive: true,
                 createdAt: {
                   gte: new Date(new Date().setHours(0, 0, 0, 0)),
                 },
@@ -87,6 +88,9 @@ export class CustomerService {
                   gte: new Date(new Date().setHours(0, 0, 0, 0)),
                 },
               },
+              orderBy: {
+                createdAt: 'asc',
+              },
               include: {
                 bank: true,
               },
@@ -99,13 +103,27 @@ export class CustomerService {
     if (!customer) {
       throw new NotFoundException('Datos del cliente no encontrados');
     }
-
     let currentDebt = 0;
 
-    const salesData = customer.sales.map(sale => {
-      const totalPayments = sale.payments.reduce((total, payment) => total + payment.amount, 0);
-      const subtotal = sale.amount - totalPayments;
-      currentDebt += subtotal;
+    const salesData: Sale[] = customer.sales.map(sale => {
+      let saleSubtotal = sale.amount;
+
+      const mappedPayments: Payment[] = sale.payments.map(payment => {
+        const totalPayments = sale.payments.reduce((total, pay) => total + pay.amount, 0);
+        saleSubtotal -= payment.amount;
+
+        return {
+          id: payment.id,
+          docReference: payment.docReference,
+          description: payment.description,
+          amount: payment.amount,
+          bankDescription: payment.bank ? payment.bank.description || '' : '',
+          docAuthorization: payment.docAuthorization || '',
+          createdAt: payment.createdAt,
+          subtotal: saleSubtotal,
+        };
+      });
+      currentDebt += saleSubtotal;
 
       return {
         id: sale.id,
@@ -113,16 +131,7 @@ export class CustomerService {
         description: sale.description,
         amount: sale.amount,
         createdAt: sale.createdAt,
-        subtotal,
-        payments: sale.payments.map(payment => ({
-          id: payment.id,
-          docReference: payment.docReference,
-          description: payment.description,
-          amount: payment.amount,
-          bankDescription: payment.bank ? payment.bank.description || '' : '',
-          docAuthorization: payment.docAuthorization || '',
-          createdAt: payment.createdAt
-        })),
+        payments: mappedPayments,
       };
     });
 
