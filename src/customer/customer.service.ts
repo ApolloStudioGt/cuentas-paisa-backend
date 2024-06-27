@@ -84,6 +84,7 @@ export class CustomerService {
           include: {
             payments: {
               where: {
+                isActive: true,
                 createdAt: {
                   gte: new Date(new Date().setHours(0, 0, 0, 0)),
                 },
