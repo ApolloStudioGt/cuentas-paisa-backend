@@ -32,9 +32,6 @@ export class CustomerService {
             payments: {
               where: {
                 isActive: true,
-                createdAt: {
-                  gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                },
               },
             },
           },
@@ -85,9 +82,6 @@ export class CustomerService {
             payments: {
               where: {
                 isActive: true,
-                createdAt: {
-                  gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                },
               },
               orderBy: {
                 createdAt: 'asc',
