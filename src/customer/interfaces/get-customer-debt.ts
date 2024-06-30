@@ -14,8 +14,8 @@ export interface Sale {
     docReference: string;
     description: string;
     amount: number;
-    createdAt: Date;
     subtotal: number;
+    createdAt: Date;
     payments: Payment[];
 }
 
@@ -27,4 +27,5 @@ export interface Payment {
     bankDescription: string;
     docAuthorization: string;
     createdAt: Date;
+    subtotal: number;
 }

@@ -47,7 +47,7 @@ export const getCustomerBalanceDetailReport = (
                 valign: 'middle',
             },
             {
-                text: 'Recibo de Pago No.',
+                text: 'Recibo de Pago',
                 bold: true,
                 alignment: 'center',
                 valign: 'middle',
