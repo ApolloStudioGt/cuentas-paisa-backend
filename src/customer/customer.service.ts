@@ -9,6 +9,7 @@ import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetAllCustomersDebt } from './interfaces/get-all-customers-debt';
 import { GetCustomerDebt, Payment, Sale } from './interfaces/get-customer-debt';
+import isValidNit from '../common/utils/nit-validator';
 
 @Injectable()
 export class CustomerService {
@@ -76,7 +77,7 @@ export class CustomerService {
             paid: false,
           },
           orderBy: {
-            createdAt: 'asc'
+            createdAt: 'asc',
           },
           include: {
             payments: {
@@ -100,11 +101,10 @@ export class CustomerService {
     }
     let currentDebt = 0;
 
-    const salesData: Sale[] = customer.sales.map(sale => {
+    const salesData: Sale[] = customer.sales.map((sale) => {
       let saleSubtotal = sale.amount;
 
-      const mappedPayments: Payment[] = sale.payments.map(payment => {
-        const totalPayments = sale.payments.reduce((total, pay) => total + pay.amount, 0);
+      const mappedPayments: Payment[] = sale.payments.map((payment) => {
         saleSubtotal -= payment.amount;
 
         return {
@@ -155,12 +155,17 @@ export class CustomerService {
   }
 
   async create(
-    createcustomerDto: CreateCustomerDto): Promise<Customer | string> {
+    createcustomerDto: CreateCustomerDto,
+  ): Promise<Customer | string> {
     const existingCustomer = await this.prismaService.customer.findUnique({
-      where: { 
-        nit: createcustomerDto.nit
+      where: {
+        nit: createcustomerDto.nit,
       },
     });
+
+    if (!isValidNit(createcustomerDto.nit)) {
+      throw new BadRequestException('Invalid NIT');
+    }
 
     if (existingCustomer) {
       throw new BadRequestException(

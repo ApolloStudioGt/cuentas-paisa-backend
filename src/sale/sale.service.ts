@@ -25,6 +25,24 @@ export class SaleService {
   }
 
   async create(createSaleDto: CreateSaleDto): Promise<Sale> {
+    const saleType = await this.prismaService.saleType.findUnique({
+      where: { id: createSaleDto.saleTypeId },
+    });
+
+    if (!saleType)
+      throw new NotFoundException(
+        `Sale type with id ${createSaleDto.saleTypeId} not found`,
+      );
+
+    const customer = await this.prismaService.customer.findUnique({
+      where: { id: createSaleDto.customerId },
+    });
+
+    if (!customer)
+      throw new NotFoundException(
+        `Customer with id ${createSaleDto.customerId} not found`,
+      );
+
     return this.prismaService.sale.create({ data: createSaleDto });
   }
 
