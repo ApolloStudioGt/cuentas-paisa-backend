@@ -21,8 +21,7 @@ export class ReportController {
   @Get('customerbalance/:id')
   async customerBalanceDetail(@Param('id') id: string, @Res() response: Response) {
 
-      const pdfDoc = await this.reportService.customerBalanceDetail(id);
-      const reportName = `DetalleSaldo_${id}.pdf`;
+      const { pdfDoc, reportName } = await this.reportService.customerBalanceDetail(id);
 
       response.setHeader('Content-Type', 'application/pdf');
       response.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(reportName)}"`);

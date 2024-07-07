@@ -25,6 +25,7 @@ async function bootstrap() {
       'Accept',
       'Authorization',
     ],
+    exposedHeaders: ['Content-Disposition',]
   });
 
   const config = new DocumentBuilder()
