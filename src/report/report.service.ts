@@ -88,7 +88,14 @@ export class ReportService {
         sales: data
       });
 
-      return this.printerService.createPdf(docDefinition);
+      const pdfDoc = this.printerService.createPdf(docDefinition);
+
+      const currentDate = new Date().toLocaleDateString('en-GB').replace(/\//g, '');
+
+      const reportName = `DetalleSaldo_${customerDetail.fullName.replace(/\s+/g, '')}_${currentDate}.pdf`;
+
+      return { pdfDoc, reportName };
+
     } catch (error) {
       throw new InternalServerErrorException('Error al generar el reporte');
     }
