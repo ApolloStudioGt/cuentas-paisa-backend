@@ -27,8 +27,14 @@ export class CustomerService {
 
   async findAllCurrentDebt(): Promise<GetAllCustomersDebt[]> {
     const customers = await this.prismaService.customer.findMany({
+      where: {
+        isActive: true,
+      },
       include: {
         sales: {
+          where: {
+            isActive: true,
+          },
           include: {
             payments: {
               where: {
@@ -74,6 +80,7 @@ export class CustomerService {
       include: {
         sales: {
           where: {
+            isActive: true,
             paid: false,
           },
           orderBy: {
