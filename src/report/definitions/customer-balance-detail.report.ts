@@ -1,7 +1,7 @@
-import { TDocumentDefinitions } from "pdfmake/interfaces";
-import { CustomerBalanceDetailDto, PaymentDto } from "../dto/detail-customer-balance.dto";
-import { DateFormatter } from "../helpers";
-import { footerSection, headerSection } from "../sections";
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
+import { CustomerBalanceDetailDto, PaymentDto } from '../dto/detail-customer-balance.dto';
+import { DateFormatter } from '../helpers';
+import { footerSection, headerSection } from '../sections';
 
 interface ReportOptions {
     fullName: string;
