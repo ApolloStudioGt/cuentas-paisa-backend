@@ -25,7 +25,7 @@ export class ReportController {
     response.setHeader('Content-Type', 'application/pdf');
     response.setHeader(
       'Content-Disposition',
-      `attachment; filename="${encodeURIComponent(reportName)}"`,
+      `attachment; filename='${encodeURIComponent(reportName)}'`,
     );
 
     pdfDoc.info.Title = reportName;
@@ -39,7 +39,7 @@ export class ReportController {
 
     response.statusCode = 200;
     response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(reportName)}"`);
+    response.setHeader('Content-Disposition', `attachment; filename='${encodeURIComponent(reportName)}'`);
 
     pdfDoc.info.Title = reportName;
     pdfDoc.pipe(response);
@@ -53,7 +53,7 @@ export class ReportController {
 
     response.statusCode = 200;
     response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(reportName)}"`);
+    response.setHeader('Content-Disposition', `attachment; filename='${encodeURIComponent(reportName)}'`);
 
     pdfDoc.info.Title = reportName;
     pdfDoc.pipe(response);

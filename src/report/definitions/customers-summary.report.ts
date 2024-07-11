@@ -1,7 +1,7 @@
-import { TDocumentDefinitions } from "pdfmake/interfaces";
-import { GetCustomerDebt, Sale, Payment } from "src/customer/interfaces/get-customer-debt";
-import { DateFormatter } from "../helpers";
-import { headerSection, footerSection } from "../sections";
+import { TDocumentDefinitions } from 'pdfmake/interfaces';
+import { GetCustomerDebt, Sale, Payment } from 'src/customer/interfaces/get-customer-debt';
+import { DateFormatter } from '../helpers';
+import { headerSection, footerSection } from '../sections';
 
 interface ReportOptions {
     customers: GetCustomerDebt[];
