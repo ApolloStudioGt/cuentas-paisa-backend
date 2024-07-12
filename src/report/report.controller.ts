@@ -13,7 +13,11 @@ export class ReportController {
   @Get('customerbalance') async allCustomerBalance(@Res() response: Response) {
     const pdfDoc = await this.reportService.allCustomerBalance();
 
-    response.setHeader('Content-Type', 'application/pdf');
+    response.status(200).set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename='SaldosPendientesClientesActivos.pdf'`,
+    });
+
     pdfDoc.info.Title = 'Saldo_de_Clientes';
     pdfDoc.pipe(response);
     pdfDoc.end();
@@ -26,11 +30,10 @@ export class ReportController {
     const { pdfDoc, reportName } =
       await this.reportService.customerBalanceDetail(id);
 
-    response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader(
-      'Content-Disposition',
-      `attachment; filename='${encodeURIComponent(reportName)}'`,
-    );
+    response.status(200).set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename='${encodeURIComponent(reportName)}'`,
+    });
 
     pdfDoc.info.Title = reportName;
     pdfDoc.pipe(response);
@@ -45,12 +48,10 @@ export class ReportController {
     const { pdfDoc, reportName } =
       await this.reportService.transactionsByDate(transactionsById);
 
-    response.statusCode = 200;
-    response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader(
-      'Content-Disposition',
-      `attachment; filename='${encodeURIComponent(reportName)}'`,
-    );
+    response.status(200).set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename='${encodeURIComponent(reportName)}'`,
+    });
 
     pdfDoc.info.Title = reportName;
     pdfDoc.pipe(response);
@@ -65,12 +66,10 @@ export class ReportController {
     const { pdfDoc, reportName } =
       await this.reportService.summaryTransactionsByDate(summaryTransactions);
 
-    response.statusCode = 200;
-    response.setHeader('Content-Type', 'application/pdf');
-    response.setHeader(
-      'Content-Disposition',
-      `attachment; filename='${encodeURIComponent(reportName)}'`,
-    );
+    response.status(200).set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename='${encodeURIComponent(reportName)}'`,
+    });
 
     pdfDoc.info.Title = reportName;
     pdfDoc.pipe(response);
