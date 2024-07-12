@@ -55,6 +55,7 @@ export class ReportService {
     const docDefinition = getCustomerBalanceReport({
       customerBalance: customerBalance,
     });
+    
     return this.printerService.createPdf(docDefinition);
   }
 
