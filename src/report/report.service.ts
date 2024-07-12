@@ -1,6 +1,7 @@
 import {
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrinterService } from 'src/printer/printer.service';
@@ -22,6 +23,7 @@ import { SummaryTransactions } from './interfaces/summary-transactions';
 
 @Injectable()
 export class ReportService {
+  private readonly logger = new Logger(ReportService.name);
   constructor(
     private readonly prismaService: PrismaService,
     private readonly printerService: PrinterService,
@@ -67,7 +69,7 @@ export class ReportService {
     const docDefinition = getCustomerBalanceReport({
       customerBalance: customerBalance,
     });
-    
+
     return this.printerService.createPdf(docDefinition);
   }
 
@@ -116,6 +118,7 @@ export class ReportService {
 
       return { pdfDoc, reportName };
     } catch (error) {
+      this.logger.error(error);
       throw new InternalServerErrorException('Error al generar el reporte');
     }
   }
@@ -214,6 +217,7 @@ export class ReportService {
 
       return { pdfDoc, reportName };
     } catch (error) {
+      this.logger.error(error);
       if (error instanceof NotFoundException) {
         throw error;
       }
@@ -327,6 +331,7 @@ export class ReportService {
 
       return { pdfDoc, reportName };
     } catch (error) {
+      this.logger.error(error);
       if (error instanceof NotFoundException) {
         throw error;
       }
