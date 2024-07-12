@@ -1,11 +1,23 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrinterService } from 'src/printer/printer.service';
-import { getCustomerBalanceDetailReport, getCustomerBalanceReport, getCustomerSummaryReport } from './definitions';
+import {
+  getCustomerBalanceDetailReport,
+  getCustomerBalanceReport,
+  getCustomerSummaryReport,
+} from './definitions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomerService } from 'src/customer/customer.service';
 import { CustomerBalanceDetailDto } from './dto/detail-customer-balance.dto';
 import { TransactionsById } from './interfaces/transactions-by-id';
-import { GetCustomerDebt, Payment, Sale } from 'src/customer/interfaces/get-customer-debt';
+import {
+  GetCustomerDebt,
+  Payment,
+  Sale,
+} from 'src/customer/interfaces/get-customer-debt';
 import { SummaryTransactions } from './interfaces/summary-transactions';
 
 @Injectable()
@@ -109,7 +121,7 @@ export class ReportService {
 
   async transactionsByDate(transactionsById: TransactionsById) {
     try {
-      const { id, startDate, endDate, } = transactionsById;
+      const { id, startDate, endDate } = transactionsById;
 
       const customer = await this.prismaService.customer.findUnique({
         where: {
@@ -154,10 +166,10 @@ export class ReportService {
       });
 
       if (!customer) {
-        throw new NotFoundException('No existen transacciones entre las fechas ingresadas');
+        throw new NotFoundException(
+          'No existen transacciones entre las fechas ingresadas',
+        );
       }
-
-      let currentDebt = 0;
 
       const salesData: Sale[] = customer.sales.map((sale) => {
         let saleSubtotal = sale.amount;
@@ -176,7 +188,6 @@ export class ReportService {
             subtotal: saleSubtotal,
           };
         });
-        currentDebt += saleSubtotal;
 
         return {
           id: sale.id,
@@ -201,7 +212,6 @@ export class ReportService {
       const reportName = `DetalleTransacciones_${customer.fullName.replace(/\s+/g, '')}.pdf`;
 
       return { pdfDoc, reportName };
-
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
@@ -213,7 +223,7 @@ export class ReportService {
   async summaryTransactionsByDate(summaryTransactions: SummaryTransactions) {
     try {
       const { startDate, endDate } = summaryTransactions;
-  
+
       const customersData = await this.prismaService.customer.findMany({
         where: {
           isActive: true,
@@ -254,17 +264,19 @@ export class ReportService {
           },
         },
       });
-  
+
       if (!customersData || customersData.length == 0) {
-        throw new NotFoundException('No existen transacciones entre las fechas ingresadas');
+        throw new NotFoundException(
+          'No existen transacciones entre las fechas ingresadas',
+        );
       }
 
-      const mappedData: GetCustomerDebt[] = customersData.map(customer => {
+      const mappedData: GetCustomerDebt[] = customersData.map((customer) => {
         let currentDebt = 0;
 
         const salesData: Sale[] = customer.sales.map((sale) => {
           let saleSubtotal = sale.amount;
-          
+
           const mappedPayments: Payment[] = sale.payments.map((payment) => {
             saleSubtotal -= payment.amount;
 
@@ -273,7 +285,7 @@ export class ReportService {
               docReference: payment.docReference,
               description: payment.description,
               amount: payment.amount,
-              bankDescription: payment.bank ? payment.bank.description: '',
+              bankDescription: payment.bank ? payment.bank.description : '',
               docAuthorization: payment.docAuthorization || '',
               createdAt: payment.createdAt,
               subtotal: saleSubtotal,
@@ -313,7 +325,6 @@ export class ReportService {
       const reportName = `ResumenTransaccionesClientesActivos.pdf`;
 
       return { pdfDoc, reportName };
-
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;

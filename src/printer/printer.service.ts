@@ -45,8 +45,13 @@ const customerBalanceLayout: Record<string, CustomTableLayout> = {
 };
 
 const isSaleRow = (cell: any): boolean => {
-  return typeof cell === 'object' && 'text' in cell && typeof cell.text === 'string' && cell.text.trim() !== '';
-}
+  return (
+    typeof cell === 'object' &&
+    'text' in cell &&
+    typeof cell.text === 'string' &&
+    cell.text.trim() !== ''
+  );
+};
 
 const customerBalanceDetailLayout: Record<string, CustomTableLayout> = {
   customDetailLayout: {
@@ -86,7 +91,10 @@ export class PrinterService {
     docDefinition: TDocumentDefinitions,
     options: BufferOptions = {},
   ): PDFKit.PDFDocument {
-    options.tableLayouts = { ...customerBalanceLayout, ...customerBalanceDetailLayout };
+    options.tableLayouts = {
+      ...customerBalanceLayout,
+      ...customerBalanceDetailLayout,
+    };
     return this.printer.createPdfKitDocument(docDefinition, options);
   }
 }
