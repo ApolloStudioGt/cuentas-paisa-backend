@@ -2,7 +2,7 @@ import { Content } from 'pdfmake/interfaces';
 import { DateFormatter } from '../helpers';
 
 const logo: Content = {
-  image: 'src/assets/images/paisa-bombas-04.png',
+  image: './src/assets/images/paisa-bombas-04.png',
   width: 168,
   height: 50,
   alignment: 'center',

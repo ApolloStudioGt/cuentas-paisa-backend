@@ -8,10 +8,10 @@ import {
 
 const fonts = {
   Roboto: {
-    normal: 'src/assets/fonts/roboto/Roboto-Regular.ttf',
-    bold: 'src/assets/fonts/roboto/Roboto-Medium.ttf',
-    italics: 'src/assets/fonts/roboto/Roboto-Italic.ttf',
-    bolditalics: 'fsrc/assets/fonts/roboto/Roboto-MediumItalic.ttf',
+    normal: './src/assets/fonts/roboto/Roboto-Regular.ttf',
+    bold: './src/assets/fonts/roboto/Roboto-Medium.ttf',
+    italics: './src/assets/fonts/roboto/Roboto-Italic.ttf',
+    bolditalics: './src/assets/fonts/roboto/Roboto-MediumItalic.ttf',
   },
 };
 
