@@ -19,5 +19,9 @@
                 "OPTIONS"
             ]
         }
-    ]
+    ],
+    "static": {
+        "src": "dist/assets",
+        "dest": "assets"
+    }
 }

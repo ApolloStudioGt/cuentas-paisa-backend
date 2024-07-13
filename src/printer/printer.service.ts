@@ -5,13 +5,38 @@ import {
   CustomTableLayout,
   TDocumentDefinitions,
 } from 'pdfmake/interfaces';
+import * as path from 'path';
 
 const fonts = {
   Roboto: {
-    normal: './src/assets/fonts/roboto/Roboto-Regular.ttf',
-    bold: './src/assets/fonts/roboto/Roboto-Medium.ttf',
-    italics: './src/assets/fonts/roboto/Roboto-Italic.ttf',
-    bolditalics: './src/assets/fonts/roboto/Roboto-MediumItalic.ttf',
+    normal: path.join(
+      __dirname,
+      'assets',
+      'fonts',
+      'roboto',
+      'Roboto-Medium.ttf',
+    ),
+    bold: path.join(
+      __dirname,
+      'assets',
+      'fonts',
+      'roboto',
+      'Roboto-Medium.ttf',
+    ),
+    italics: path.join(
+      __dirname,
+      'assets',
+      'fonts',
+      'roboto',
+      'Roboto-Italic.ttf',
+    ),
+    bolditalics: path.join(
+      __dirname,
+      'assets',
+      'fonts',
+      'roboto',
+      'Roboto-MediumItalic.ttf',
+    ),
   },
 };
 
