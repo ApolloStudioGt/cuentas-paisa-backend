@@ -6,15 +6,6 @@ import {
   TDocumentDefinitions,
 } from 'pdfmake/interfaces';
 
-const fonts = {
-  Roboto: {
-    normal: './src/assets/fonts/roboto/Roboto-Regular.ttf',
-    bold: './src/assets/fonts/roboto/Roboto-Medium.ttf',
-    italics: './src/assets/fonts/roboto/Roboto-Italic.ttf',
-    bolditalics: './src/assets/fonts/roboto/Roboto-MediumItalic.ttf',
-  },
-};
-
 const customerBalanceLayout: Record<string, CustomTableLayout> = {
   customLayout: {
     hLineWidth: function (i, node) {
@@ -85,7 +76,14 @@ const customerBalanceDetailLayout: Record<string, CustomTableLayout> = {
 
 @Injectable()
 export class PrinterService {
-  private printer = new PdfPrinter(fonts);
+  private printer = new PdfPrinter({
+    Roboto: {
+      normal: 'Helvetica',
+      bold: 'Helvetica-Bold',
+      italics: 'Helvetica-Oblique',
+      bolditalics: 'Helvetica-BoldOblique',
+    },
+  });
 
   createPdf(
     docDefinition: TDocumentDefinitions,
