@@ -31,7 +31,8 @@ export class ReportService {
   ) {}
 
   async allCustomerBalance() {
-    let customerBalance = [];
+    try {
+      let customerBalance = [];
 
     const latestCut = await this.prismaService.accountCutOff.findFirst({
       where: {
@@ -71,6 +72,13 @@ export class ReportService {
     });
 
     return this.printerService.createPdf(docDefinition);
+    } catch (error) {
+      this.logger.error(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error al generar el reporte');
+    }
   }
 
   async customerBalanceDetail(id: string) {
@@ -119,6 +127,9 @@ export class ReportService {
       return { pdfDoc, reportName };
     } catch (error) {
       this.logger.error(error);
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Error al generar el reporte');
     }
   }

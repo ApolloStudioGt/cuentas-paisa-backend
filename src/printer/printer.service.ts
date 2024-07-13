@@ -10,18 +10,20 @@ import * as path from 'path';
 const fonts = {
   Roboto: {
     normal: path.join(
-      __dirname,
+      'src',
+      'printer',
       'assets',
       'fonts',
       'roboto',
       'Roboto-Medium.ttf',
     ),
     bold: path.join(
-      __dirname,
+      'src',
+      'printer',
       'assets',
       'fonts',
       'roboto',
-      'Roboto-Medium.ttf',
+      'Roboto-Bold.ttf',
     ),
     italics: path.join(
       __dirname,
