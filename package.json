@@ -9,7 +9,8 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && npm run copy-assets",
+    "copy-assets": "copyfiles -u 1 src/printer/assets/fonts/**/* dist/src/ && copyfiles -u 1 src/report/sections/assets/images/**/* dist/src/",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
