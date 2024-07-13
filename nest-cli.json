@@ -6,10 +6,8 @@
     "assets": [
       {
         "include": "../src/assets",
-        "outDir": "dist/src",
-        "watchAssets": true
+        "outDir": "dist/src"
       }
-    ],
-    "watchAssets": true
+    ]
   }
 }
