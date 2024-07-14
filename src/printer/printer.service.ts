@@ -16,13 +16,7 @@ const fonts = {
       'roboto',
       'Roboto-Medium.ttf',
     ),
-    bold: path.join(
-      __dirname,
-      'assets',
-      'fonts',
-      'roboto',
-      'Roboto-Bold.ttf',
-    ),
+    bold: path.join(__dirname, 'assets', 'fonts', 'roboto', 'Roboto-Bold.ttf'),
     italics: path.join(
       __dirname,
       'assets',
