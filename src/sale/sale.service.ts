@@ -109,7 +109,10 @@ export class SaleService {
       where: { salesId: sale.id, isActive: true },
     });
 
-    const totalPaid = payments.reduce((sum, payment ) => sum + payment.amount, 0);
+    const totalPaid = payments.reduce(
+      (sum, payment) => sum + payment.amount,
+      0,
+    );
     const currentDebt = sale.amount - totalPaid;
 
     const response: GetDetailById = {

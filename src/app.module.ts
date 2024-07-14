@@ -11,6 +11,8 @@ import { ReportModule } from './report/report.module';
 import { PrinterModule } from './printer/printer.module';
 import { BankModule } from './bank/bank.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { TasksModule } from './task/task.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ReportModule,
     SaleTypeModule,
     SalesModule,
+    ScheduleModule.forRoot(),
+    TasksModule,
   ],
   providers: [FirebaseAdmin],
 })

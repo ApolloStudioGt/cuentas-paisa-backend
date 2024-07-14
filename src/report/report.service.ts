@@ -32,46 +32,52 @@ export class ReportService {
 
   async allCustomerBalance() {
     try {
-      let customerBalance = [];
-
-    const latestCut = await this.prismaService.accountCutOff.findFirst({
-      where: {
-        isActive: true,
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-
-    if (latestCut) {
-      const lastCutDate = new Date(latestCut.createdAt)
-        .toISOString()
-        .split('T')[0];
-      customerBalance = await this.prismaService.accountCutOff.findMany({
+      const customers = await this.prismaService.customer.findMany({
         where: {
           isActive: true,
-          createdAt: {
-            gte: new Date(`${lastCutDate}T00:00:00Z`),
-            lte: new Date(`${lastCutDate}T23:59:59.999Z`),
-          },
         },
-        orderBy: {
-          customer: {
-            fullName: 'asc',
-          },
-        },
-        distinct: ['customerId'],
         include: {
-          customer: true,
+          accountCutOffs: true,
+          sales: {
+            where: {
+              isActive: true,
+              paid: false,
+            },
+            include: {
+              payments: {
+                where: {
+                  isActive: true,
+                },
+              },
+            },
+          },
         },
       });
-    }
 
-    const docDefinition = getCustomerBalanceReport({
-      customerBalance: customerBalance,
-    });
+      const customerBalance = customers.map((customer) => {
+        let currentDebt = 0;
 
-    return this.printerService.createPdf(docDefinition);
+        customer.sales.forEach((sale) => {
+          const totalPayments = sale.payments.reduce(
+            (total, payment) => total + payment.amount,
+            0,
+          );
+          const total = sale.amount - totalPayments;
+          currentDebt += total;
+        });
+
+        return {
+          customer,
+          amount: currentDebt,
+          createdAt: new Date(),
+        };
+      });
+
+      const docDefinition = getCustomerBalanceReport({
+        customerBalance,
+      });
+
+      return this.printerService.createPdf(docDefinition);
     } catch (error) {
       this.logger.error(error);
       if (error instanceof NotFoundException) {
