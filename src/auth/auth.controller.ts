@@ -30,6 +30,7 @@ export class AuthController {
     return this.authService.login(signInDto);
   }
 
+  @PublicApi()
   @Post('singup')
   async create(@Body() singUpDto: SingUpDto) {
     return this.authService.create(singUpDto);
