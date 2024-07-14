@@ -7,7 +7,9 @@ import { Customer } from '@prisma/client';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
-import { GetCustomerDebt } from './interfaces/get-customer-debt';
+import { GetAllCustomersDebt } from './interfaces/get-all-customers-debt';
+import { GetCustomerDebt, Payment, Sale } from './interfaces/get-customer-debt';
+import isValidNit from '../common/utils/nit-validator';
 
 @Injectable()
 export class CustomerService {
@@ -23,19 +25,20 @@ export class CustomerService {
     });
   }
 
-  async findAllCurrentDebt(): Promise<GetCustomerDebt[]> {
+  async findAllCurrentDebt(): Promise<GetAllCustomersDebt[]> {
     const customers = await this.prismaService.customer.findMany({
+      where: {
+        isActive: true,
+      },
       include: {
         sales: {
           where: {
-            paid: false,
+            isActive: true,
           },
           include: {
             payments: {
               where: {
-                createdAt: {
-                  gte: new Date(new Date().setHours(0, 0, 0, 0)),
-                },
+                isActive: true,
               },
             },
           },
@@ -43,7 +46,7 @@ export class CustomerService {
       },
     });
 
-    const customersDebt: GetCustomerDebt[] = customers.map((customer) => {
+    const customersDebt: GetAllCustomersDebt[] = customers.map((customer) => {
       let totalDebt = 0;
 
       customer.sales.forEach((sale) => {
@@ -68,6 +71,86 @@ export class CustomerService {
     return customersDebt;
   }
 
+  async findCurrentDebt(id: string): Promise<GetCustomerDebt> {
+    const customer = await this.prismaService.customer.findUnique({
+      where: {
+        id,
+        isActive: true,
+      },
+      include: {
+        sales: {
+          where: {
+            isActive: true,
+            paid: false,
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+          include: {
+            payments: {
+              where: {
+                isActive: true,
+              },
+              orderBy: {
+                createdAt: 'asc',
+              },
+              include: {
+                bank: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Datos del cliente no encontrados');
+    }
+    let currentDebt = 0;
+
+    const salesData: Sale[] = customer.sales.map((sale) => {
+      let saleSubtotal = sale.amount;
+
+      const mappedPayments: Payment[] = sale.payments.map((payment) => {
+        saleSubtotal -= payment.amount;
+
+        return {
+          id: payment.id,
+          docReference: payment.docReference,
+          description: payment.description,
+          amount: payment.amount,
+          bankDescription: payment.bank ? payment.bank.description || '' : '',
+          docAuthorization: payment.docAuthorization || '',
+          createdAt: payment.createdAt,
+          subtotal: saleSubtotal,
+        };
+      });
+      currentDebt += saleSubtotal;
+
+      return {
+        id: sale.id,
+        docReference: sale.docReference,
+        description: sale.description,
+        amount: sale.amount,
+        subtotal: saleSubtotal,
+        createdAt: sale.createdAt,
+        payments: mappedPayments,
+      };
+    });
+
+    const detailedBalanceCustomer: GetCustomerDebt = {
+      id: customer.id,
+      fullName: customer.fullName,
+      nit: customer.nit,
+      email: customer.email,
+      phone: customer.phone,
+      currentDebt,
+      createdAt: customer.createdAt,
+      sales: salesData,
+    };
+    return detailedBalanceCustomer;
+  }
+
   async findOne(id: string): Promise<Customer | string> {
     const customer = await this.prismaService.customer.findFirst({
       where: { id, isActive: true },
@@ -82,8 +165,14 @@ export class CustomerService {
     createcustomerDto: CreateCustomerDto,
   ): Promise<Customer | string> {
     const existingCustomer = await this.prismaService.customer.findUnique({
-      where: { nit: createcustomerDto.nit },
+      where: {
+        nit: createcustomerDto.nit,
+      },
     });
+
+    if (!isValidNit(createcustomerDto.nit)) {
+      throw new BadRequestException('Invalid NIT');
+    }
 
     if (existingCustomer) {
       throw new BadRequestException(

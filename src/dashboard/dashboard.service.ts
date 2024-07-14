@@ -7,7 +7,9 @@ export class DashboardService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async summary(): Promise<GetSummaryDashboard> {
-    const registered = await this.prismaService.customer.count();
+    const registered = await this.prismaService.customer.count({
+      where: { isActive: true },
+    });
 
     const totalPayments = await this.prismaService.payment.aggregate({
       _sum: {
@@ -31,6 +33,7 @@ export class DashboardService {
       customerRegistered: registered,
       paymentsAmount: totalPayments._sum.amount || 0,
       salesAmount: totalSales._sum.amount || 0,
+      pendingAmount: totalSales._sum.amount - totalPayments._sum.amount || 0,
     };
   }
 }

@@ -20,6 +20,12 @@ export class PaymentService {
     });
   }
 
+  async findBySale(id: string): Promise<Payment[]> {
+    return await this.prismaService.payment.findMany({
+      where: { salesId: id, isActive: true },
+    });
+  }
+
   async findOne(id: string): Promise<Payment | string> {
     const payment = await this.prismaService.payment.findUnique({
       where: { id, isActive: true },

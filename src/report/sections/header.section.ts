@@ -1,8 +1,9 @@
 import { Content } from 'pdfmake/interfaces';
 import { DateFormatter } from '../helpers';
+import * as path from 'path';
 
 const logo: Content = {
-  image: 'src/assets/images/paisa-bombas-04.png',
+  image: path.join(__dirname, 'assets', 'images', 'paisa-bombas-04.png'),
   width: 168,
   height: 50,
   alignment: 'center',
@@ -59,7 +60,7 @@ export const headerSection = (options: HeaderOptions): Content => {
     : null;
 
   return {
-    margin: [50, 35, 50, 10],
+    margin: [50, 35, 30, 10],
     columns: [headerLogo, headerTitle, headerDate],
   };
 };

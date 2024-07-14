@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BankService } from './bank.service';
+import { CreateBankDto } from './dto/create-bank.dto';
 
 @Controller('bank')
 @ApiTags('bank')
@@ -10,5 +11,10 @@ export class BankController {
   @Get()
   findAll() {
     return this.bankService.findAll();
+  }
+
+  @Post()
+  create(@Body() createBankDto: CreateBankDto) {
+    return this.bankService.create(createBankDto);
   }
 }

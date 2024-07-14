@@ -1,4 +1,4 @@
-export interface GetCustomerDebt {
+export interface GetAllByCustomer {
   id: string;
   fullName: string;
   nit: string;
@@ -16,16 +16,4 @@ export interface Sale {
   amount: number;
   subtotal: number;
   createdAt: Date;
-  payments: Payment[];
-}
-
-export interface Payment {
-  id: string;
-  docReference: string;
-  description: string;
-  amount: number;
-  bankDescription: string;
-  docAuthorization: string;
-  createdAt: Date;
-  subtotal: number;
 }

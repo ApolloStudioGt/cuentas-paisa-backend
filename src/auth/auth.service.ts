@@ -41,14 +41,18 @@ export class AuthService {
 
     try {
       const userUuid = uuid();
+
       const createdUser = await app.auth().createUser({
         email,
         password,
         displayName: fullName,
         uid: userUuid,
       });
+
       await app.auth().setCustomUserClaims(createdUser.uid, { Role: 'seller' });
+
       await this.usersService.create({ email, fullName, id: userUuid });
+
       return createdUser;
     } catch (error) {
       throw new BadRequestException(error.message);

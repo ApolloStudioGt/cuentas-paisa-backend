@@ -1,11 +1,10 @@
 import type { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { footerSection, headerSection } from '../sections';
-import { AccountCutOff, Customer } from '@prisma/client';
 
 import { DateFormatter } from '../helpers';
 
 interface ReportOptions {
-  customerBalance: (AccountCutOff & { customer: Customer })[];
+  customerBalance;
 }
 
 export const getCustomerBalanceReport = (
