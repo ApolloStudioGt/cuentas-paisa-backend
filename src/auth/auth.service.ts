@@ -10,6 +10,7 @@ import {
 import { SingUpDto } from './dto/singUp.dto';
 import { SignInDto } from './dto/singIn.dto';
 import { FirebaseAdmin } from '../config/firebase.setup';
+import { Role } from '../common/enums/role.enum';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +50,9 @@ export class AuthService {
         uid: userUuid,
       });
 
-      await app.auth().setCustomUserClaims(createdUser.uid, { Role: 'seller' });
+      await app
+        .auth()
+        .setCustomUserClaims(createdUser.uid, { Role: Role.Admin });
 
       await this.usersService.create({ email, fullName, id: userUuid });
 
