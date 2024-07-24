@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, IsUUID } from 'class-validator';
+import {
+  IsISO8601,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
 export class CreateSaleDto {
   @ApiProperty({ description: 'Sale transaction reference document ' })
@@ -31,4 +37,9 @@ export class CreateSaleDto {
   @IsNotEmpty()
   @IsUUID()
   saleTypeId: string;
+
+  @ApiProperty({ description: 'Sale transaction sold date' })
+  @IsNotEmpty()
+  @IsISO8601()
+  soldAt: string;
 }
