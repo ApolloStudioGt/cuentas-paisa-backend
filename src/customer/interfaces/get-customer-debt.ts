@@ -16,6 +16,8 @@ export interface Sale {
   amount: number;
   subtotal: number;
   createdAt: Date;
+  saleType: string;
+  soldAt: Date;
   payments: Payment[];
 }
 

@@ -98,6 +98,7 @@ export class CustomerService {
                 bank: true,
               },
             },
+            saleType: true,
           },
         },
       },
@@ -135,6 +136,8 @@ export class CustomerService {
         subtotal: saleSubtotal,
         createdAt: sale.createdAt,
         payments: mappedPayments,
+        saleType: sale.saleType.description,
+        soldAt: sale.soldAt,
       };
     });
 

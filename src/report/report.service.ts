@@ -181,6 +181,7 @@ export class ReportService {
                   bank: true,
                 },
               },
+              saleType: true,
             },
           },
         },
@@ -218,6 +219,8 @@ export class ReportService {
           subtotal: saleSubtotal,
           createdAt: sale.createdAt,
           payments: mappedPayments,
+          saleType: sale.saleType.description,
+          soldAt: sale.soldAt,
         };
       });
 
@@ -282,6 +285,7 @@ export class ReportService {
                   bank: true,
                 },
               },
+              saleType: true,
             },
           },
         },
@@ -324,6 +328,8 @@ export class ReportService {
             subtotal: saleSubtotal,
             createdAt: sale.createdAt,
             payments: mappedPayments,
+            saleType: sale.saleType.description,
+            soldAt: sale.soldAt,
           };
         });
 
