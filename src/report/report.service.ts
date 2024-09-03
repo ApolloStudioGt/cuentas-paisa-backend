@@ -16,7 +16,6 @@ import { CustomerBalanceDetailDto } from './dto/detail-customer-balance.dto';
 import { TransactionsById } from './interfaces/transactions-by-id';
 import {
   GetCustomerDebt,
-  Payment,
   Sale,
 } from 'src/customer/interfaces/get-customer-debt';
 import { SummaryTransactions } from './interfaces/summary-transactions';
@@ -43,32 +42,14 @@ export class ReportService {
               isActive: true,
               paid: false,
             },
-            include: {
-              payments: {
-                where: {
-                  isActive: true,
-                },
-              },
-            },
           },
         },
       });
 
       const customerBalance = customers.map((customer) => {
-        let currentDebt = 0;
-
-        customer.sales.forEach((sale) => {
-          const totalPayments = sale.payments.reduce(
-            (total, payment) => total + payment.amount,
-            0,
-          );
-          const total = sale.amount - totalPayments;
-          currentDebt += total;
-        });
-
         return {
           customer,
-          amount: currentDebt,
+          amount: 0,
           createdAt: new Date(),
         };
       });
@@ -95,24 +76,7 @@ export class ReportService {
         throw new NotFoundException('Datos del cliente no encontrados');
       }
 
-      const data: CustomerBalanceDetailDto[] = customerDetail.sales.map(
-        (sale) => {
-          const payments = sale.payments.map((payment) => ({
-            docReference: payment.docReference,
-            docAuthorization: payment.docAuthorization || '',
-            createdAt: payment.createdAt,
-            bankDescription: payment.bankDescription || '',
-            amount: payment.amount,
-          }));
-
-          return {
-            docReference: sale.docReference,
-            createdAt: sale.createdAt,
-            amount: sale.amount,
-            payments,
-          };
-        },
-      );
+      const data: CustomerBalanceDetailDto[] = [];
 
       const docDefinition = getCustomerBalanceDetailReport({
         fullName: customerDetail.fullName,
@@ -170,17 +134,6 @@ export class ReportService {
               createdAt: 'asc',
             },
             include: {
-              payments: {
-                where: {
-                  isActive: true,
-                },
-                orderBy: {
-                  createdAt: 'asc',
-                },
-                include: {
-                  bank: true,
-                },
-              },
               saleType: true,
             },
           },
@@ -194,31 +147,14 @@ export class ReportService {
       }
 
       const salesData: Sale[] = customer.sales.map((sale) => {
-        let saleSubtotal = sale.amount;
-
-        const mappedPayments: Payment[] = sale.payments.map((payment) => {
-          saleSubtotal -= payment.amount;
-
-          return {
-            id: payment.id,
-            docReference: payment.docReference,
-            description: payment.description,
-            amount: payment.amount,
-            bankDescription: payment.bank ? payment.bank.description || '' : '',
-            docAuthorization: payment.docAuthorization || '',
-            createdAt: payment.createdAt,
-            subtotal: saleSubtotal,
-          };
-        });
-
         return {
           id: sale.id,
           docReference: sale.docReference,
           description: sale.description,
           amount: sale.amount,
-          subtotal: saleSubtotal,
+          subtotal: 0,
           createdAt: sale.createdAt,
-          payments: mappedPayments,
+          payments: [],
           saleType: sale.saleType.description,
           soldAt: sale.soldAt,
         };
@@ -274,17 +210,6 @@ export class ReportService {
               createdAt: 'asc',
             },
             include: {
-              payments: {
-                where: {
-                  isActive: true,
-                },
-                orderBy: {
-                  createdAt: 'asc',
-                },
-                include: {
-                  bank: true,
-                },
-              },
               saleType: true,
             },
           },
@@ -298,36 +223,15 @@ export class ReportService {
       }
 
       const mappedData: GetCustomerDebt[] = customersData.map((customer) => {
-        let currentDebt = 0;
-
         const salesData: Sale[] = customer.sales.map((sale) => {
-          let saleSubtotal = sale.amount;
-
-          const mappedPayments: Payment[] = sale.payments.map((payment) => {
-            saleSubtotal -= payment.amount;
-
-            return {
-              id: payment.id,
-              docReference: payment.docReference,
-              description: payment.description,
-              amount: payment.amount,
-              bankDescription: payment.bank ? payment.bank.description : '',
-              docAuthorization: payment.docAuthorization || '',
-              createdAt: payment.createdAt,
-              subtotal: saleSubtotal,
-            };
-          });
-
-          currentDebt += saleSubtotal;
-
           return {
             id: sale.id,
             docReference: sale.docReference,
             description: sale.description,
             amount: sale.amount,
-            subtotal: saleSubtotal,
+            subtotal: 0,
             createdAt: sale.createdAt,
-            payments: mappedPayments,
+            payments: [],
             saleType: sale.saleType.description,
             soldAt: sale.soldAt,
           };
@@ -340,8 +244,8 @@ export class ReportService {
           email: customer.email,
           phone: customer.phone,
           createdAt: customer.createdAt,
-          currentDebt,
-          sales: salesData,
+          currentDebt: 0,
+          transactions: salesData,
         };
       });
 

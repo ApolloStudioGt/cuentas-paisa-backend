@@ -6,9 +6,23 @@ export interface GetCustomerDebt {
   phone: string;
   createdAt: Date;
   currentDebt: number;
-  sales: Sale[];
+  transactions: Transaction[];
 }
 
+export interface Transaction {
+  id: string;
+  docReference: string;
+  description: string;
+  amount: number;
+  createdAt: Date;
+  saleTypeId?: string;
+  soldAt?: Date;
+  bankDescription?: string;
+  docAuthorization?: string;
+  transactionType?: string;
+}
+
+//TODO: delete
 export interface Sale {
   id: string;
   docReference: string;

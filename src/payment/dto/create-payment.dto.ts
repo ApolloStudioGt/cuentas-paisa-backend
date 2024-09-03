@@ -22,10 +22,10 @@ export class CreatePaymentDto {
   @IsNumber()
   amount: number;
 
-  @ApiProperty({ description: 'Payment transaction sale id' })
+  @ApiProperty({ description: 'Sale transaction customer id' })
   @IsNotEmpty()
   @IsUUID()
-  salesId: string;
+  customerId: string;
 
   @ApiProperty({ description: 'Payment transaction bank id' })
   @IsOptional()
