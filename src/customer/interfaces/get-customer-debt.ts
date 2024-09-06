@@ -15,7 +15,7 @@ export interface Transaction {
   description: string;
   amount: number;
   createdAt: Date;
-  saleTypeId?: string;
+  saleType?: string;
   soldAt?: Date;
   bankDescription?: string;
   docAuthorization?: string;

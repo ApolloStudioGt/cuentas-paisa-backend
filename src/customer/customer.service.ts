@@ -8,11 +8,7 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetAllCustomersDebt } from './interfaces/get-all-customers-debt';
-import {
-  GetCustomerDebt,
-  Sale,
-  Transaction,
-} from './interfaces/get-customer-debt';
+import { GetCustomerDebt, Transaction } from './interfaces/get-customer-debt';
 import isValidNit from '../common/utils/nit-validator';
 
 @Injectable()
@@ -40,6 +36,9 @@ export class CustomerService {
             isActive: true,
           },
         },
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     });
 
@@ -71,6 +70,9 @@ export class CustomerService {
           orderBy: {
             createdAt: 'asc',
           },
+          include: {
+            saleType: true,
+          },
         },
         payments: {
           where: {
@@ -78,6 +80,9 @@ export class CustomerService {
           },
           orderBy: {
             createdAt: 'asc',
+          },
+          include: {
+            bank: true,
           },
         },
       },
@@ -94,7 +99,7 @@ export class CustomerService {
         description: sale.description,
         amount: sale.amount,
         createdAt: sale.createdAt,
-        saleTypeId: sale.saleTypeId,
+        saleType: sale.saleType.description,
         soldAt: sale.soldAt,
         bankDescription: null,
         docAuthorization: null,
@@ -109,9 +114,9 @@ export class CustomerService {
         description: payment.description,
         amount: payment.amount,
         createdAt: payment.createdAt,
-        saleTypeId: null,
+        saleType: null,
         soldAt: null,
-        bankDescription: payment.bankId,
+        bankDescription: payment.bank.description,
         docAuthorization: payment.docAuthorization,
         transactionType: 'payment',
       });
@@ -121,13 +126,16 @@ export class CustomerService {
       (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
     );
 
+    //swap the order of the transactions
+    transactions = transactions.reverse();
+
     const detailedBalanceCustomer: GetCustomerDebt = {
       id: customer.id,
       fullName: customer.fullName,
       nit: customer.nit,
       email: customer.email,
       phone: customer.phone,
-      currentDebt: 0,
+      currentDebt: customer.debtAmount,
       createdAt: customer.createdAt,
       transactions: transactions,
     };
