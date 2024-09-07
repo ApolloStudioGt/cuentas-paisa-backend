@@ -5,6 +5,7 @@ import {
 } from 'src/customer/interfaces/get-customer-debt';
 import { DateFormatter } from '../helpers';
 import { headerSection, footerSection } from '../sections';
+import { text } from 'stream/consumers';
 
 interface ReportOptions {
   customers: GetCustomerDebt[];
@@ -39,25 +40,81 @@ export const getCustomerSummaryReport = (
           currentDebt += transaction.amount;
         }
         acc.push([
-          'Venta',
-          transaction.docReference,
-          transaction.description,
-          DateFormatter.getDDMMYYYY(transaction.createdAt),
-          `Q. ${formatAmount(transaction.amount)}`,
-          '',
-          `Q.${formatAmount(currentDebt)}`,
+          {
+            text: 'Venta',
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: transaction.docReference,
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: transaction.description,
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: DateFormatter.getDDMMYYYY(transaction.createdAt),
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: `Q. ${formatAmount(transaction.amount)}`,
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: '',
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: `Q.${formatAmount(currentDebt)}`,
+            alignment: 'center',
+            valign: 'middle',
+          },  
         ]);
       } else if (transaction.transactionType === 'payment') {
         totalPaymentsAmount += transaction.amount;
         currentDebt -= transaction.amount;
         acc.push([
-          'Pago',
-          transaction.docReference,
-          transaction.description,
-          DateFormatter.getDDMMYYYY(transaction.createdAt),
-          `Q. ${formatAmount(transaction.amount)}`,
-          transaction.docAuthorization || transaction.bankDescription || '',
-          `Q. ${formatAmount(currentDebt)}`,
+          {
+            text: 'Pago',
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: transaction.docReference,
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: transaction.description,
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: DateFormatter.getDDMMYYYY(transaction.createdAt),
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: `Q. ${formatAmount(transaction.amount)}`,
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: transaction.docAuthorization || transaction.bankDescription || '',
+            alignment: 'center',
+            valign: 'middle',
+          },
+          {
+            text: `Q. ${formatAmount(currentDebt)}`,
+            alignment: 'center',
+            valign: 'middle',
+          },
         ]);
       }
       return acc;
@@ -125,13 +182,48 @@ export const getCustomerSummaryReport = (
           widths: ['auto', '*', '*', 80, 80, '*', 80],
           body: [
             [
-              'Tipo de Transacción',
-              'Documento de Referencia',
-              'Descripción',
-              'Fecha',
-              'Monto',
-              'Banco/Autorización',
-              'Saldo',
+              {
+                text: 'Tipo de Transacción',
+                bold: true,
+                alignment: 'center',
+                valign: 'middle',
+              },
+              {
+                text: 'Documento de Referencia',
+                bold: true,
+                alignment: 'center',
+                valign: 'middle',
+              },
+              {
+                text: 'Descripción',
+                bold: true,
+                alignment: 'center',
+                valign: 'middle',
+              },
+              {
+                text: 'Fecha',
+                bold: true,
+                alignment: 'center',
+                valign: 'middle',
+              },
+              {
+                text: 'Monto',
+                bold: true,
+                alignment: 'center',
+                valign: 'middle',
+              },
+              {
+                text: 'Banco/Autorización',
+                bold: true,
+                alignment: 'center',
+                valign: 'middle',
+              },
+              {
+                text: 'Saldo',
+                bold: true,
+                alignment: 'center',
+                valign: 'middle',
+              },
             ],
             ...salesAndPayments,
           ],
