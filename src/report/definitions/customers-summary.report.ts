@@ -1,8 +1,7 @@
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import {
   GetCustomerDebt,
-  Sale,
-  Payment,
+  Transaction,
 } from 'src/customer/interfaces/get-customer-debt';
 import { DateFormatter } from '../helpers';
 import { headerSection, footerSection } from '../sections';
@@ -28,41 +27,41 @@ export const getCustomerSummaryReport = (
   customers.forEach((customer, index) => {
     let totalSalesAmount = 0;
     let totalPaymentsAmount = 0;
+    let currentDebt = 0;
 
-    const salesAndPayments = customer.transactions.flatMap((sale: Sale) => {
-      totalSalesAmount += sale.amount;
-
-      const saleRow = [
-        DateFormatter.getDDMMYYYY(sale.createdAt),
-        sale.docReference,
-        `Q. ${formatAmount(sale.amount)}`,
-        '',
-        '',
-        '',
-        '',
-        '',
-        `Q. ${formatAmount(customer.currentDebt)}`,
-      ];
-
-      const paymentRows = sale.payments.map((payment: Payment) => {
-        totalPaymentsAmount += payment.amount;
-        return [
+    const salesAndPayments = customer.transactions.reduce<any[]>((acc, transaction) => {
+      let row: any[] = [];
+      if (transaction.transactionType === 'sale') {
+        totalSalesAmount += transaction.amount;
+        if (currentDebt === 0) {
+          currentDebt = transaction.amount;
+        } else {
+          currentDebt += transaction.amount;
+        }
+        acc.push([
+          'Venta',
+          transaction.docReference,
+          transaction.description,
+          DateFormatter.getDDMMYYYY(transaction.createdAt),
+          `Q. ${formatAmount(transaction.amount)}`,
           '',
-          '',
-          '',
-          payment.docReference,
-          payment.docAuthorization,
-          DateFormatter.getDDMMYYYY(payment.createdAt),
-          payment.bankDescription,
-          `Q. ${formatAmount(payment.amount)}`,
-          `Q. ${formatAmount(customer.currentDebt - totalPaymentsAmount)}`,
-        ];
-      });
-
-      return [saleRow, ...paymentRows];
-    });
-
-    const totalAmount = totalSalesAmount - totalPaymentsAmount;
+          `Q.${formatAmount(currentDebt)}`,
+        ]);
+      } else if (transaction.transactionType === 'payment') {
+        totalPaymentsAmount += transaction.amount;
+        currentDebt -= transaction.amount;
+        acc.push([
+          'Pago',
+          transaction.docReference,
+          transaction.description,
+          DateFormatter.getDDMMYYYY(transaction.createdAt),
+          `Q. ${formatAmount(transaction.amount)}`,
+          transaction.docAuthorization || transaction.bankDescription || '',
+          `Q. ${formatAmount(currentDebt)}`,
+        ]);
+      }
+      return acc;
+    }, []);
 
     content.push(
       {
@@ -123,17 +122,15 @@ export const getCustomerSummaryReport = (
         layout: 'customDetailLayout',
         table: {
           headerRows: 1,
-          widths: ['auto', 'auto', 80, 'auto', '*', 80, '*', 80, 80],
+          widths: ['auto', '*', '*', 80, 80, '*', 80],
           body: [
             [
+              'Tipo de Transacción',
+              'Documento de Referencia',
+              'Descripción',
               'Fecha',
-              'Documento',
-              'Monto Venta',
-              'Recibo Pago',
-              'No. Depósito',
-              'Fecha Pago',
-              'Banco',
-              'Monto Pago',
+              'Monto',
+              'Banco/Autorización',
               'Saldo',
             ],
             ...salesAndPayments,
@@ -182,7 +179,7 @@ export const getCustomerSummaryReport = (
                 bold: true,
               },
               {
-                text: `Q. ${formatAmount(totalAmount)}`,
+                text: `Q. ${formatAmount(currentDebt)}`,
               },
             ],
           ],

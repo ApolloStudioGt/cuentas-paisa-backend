@@ -37,9 +37,6 @@ export class SaleService {
       },
       include: {
         sales: {
-          where: {
-            paid: false,
-          },
           orderBy: {
             createdAt: 'asc',
           },

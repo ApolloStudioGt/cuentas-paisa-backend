@@ -127,7 +127,7 @@ export class CustomerService {
     );
 
     //swap the order of the transactions
-    transactions = transactions.reverse();
+    //transactions = transactions.reverse();
 
     const detailedBalanceCustomer: GetCustomerDebt = {
       id: customer.id,

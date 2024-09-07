@@ -21,27 +21,3 @@ export interface Transaction {
   docAuthorization?: string;
   transactionType?: string;
 }
-
-//TODO: delete
-export interface Sale {
-  id: string;
-  docReference: string;
-  description: string;
-  amount: number;
-  subtotal: number;
-  createdAt: Date;
-  saleType: string;
-  soldAt: Date;
-  payments: Payment[];
-}
-
-export interface Payment {
-  id: string;
-  docReference: string;
-  description: string;
-  amount: number;
-  bankDescription: string;
-  docAuthorization: string;
-  createdAt: Date;
-  subtotal: number;
-}

@@ -1,14 +1,11 @@
-export class CustomerBalanceDetailDto {
+export class CustomerTransactionDto {
   docReference: string;
-  createdAt: Date;
+  description: string;
   amount: number;
-  payments: PaymentDto[];
-}
-
-export class PaymentDto {
-  docReference: string;
-  docAuthorization: string;
   createdAt: Date;
-  bankDescription: string;
-  amount: number;
+  saleType?: string | null;
+  soldAt?: Date | null;
+  bankDescription?: string | null;
+  docAuthorization?: string | null;
+  transactionType: 'sale' | 'payment';
 }

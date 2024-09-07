@@ -24,12 +24,12 @@ async function main() {
 
   const adminUser = await prisma.user.upsert({
     where: {
-      id: '53d05e3d-8ec2-43d6-90a8-247f3afe7c1e',
+      id: '525efc74-e492-4905-8bca-faf05a664910',
     },
     update: {},
     create: {
       fullName: 'admin',
-      id: '53d05e3d-8ec2-43d6-90a8-247f3afe7c1e',
+      id: '525efc74-e492-4905-8bca-faf05a664910',
       email: 'kevingil1910@gmail.com',
     },
   });

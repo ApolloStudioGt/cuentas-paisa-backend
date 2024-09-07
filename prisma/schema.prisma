@@ -57,7 +57,7 @@ model Sale {
   isActive          Boolean   @default(true)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
-  soldAt           DateTime @default(now())
+  soldAt            DateTime @default(now())
   @@index([isActive])
 }
 
