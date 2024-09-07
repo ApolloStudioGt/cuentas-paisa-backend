@@ -1,20 +1,21 @@
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
-import { CustomerBalanceDetailDto, PaymentDto } from '../dto/detail-customer-balance.dto';
+import { CustomerTransactionDto } from '../dto/detail-customer-balance.dto';
 import { DateFormatter } from '../helpers';
 import { footerSection, headerSection } from '../sections';
+import { text } from 'stream/consumers';
 
 interface ReportOptions {
     fullName: string;
     nit: string;
     email: string;
     phone: string;
-    sales: CustomerBalanceDetailDto[];
+    transactions: CustomerTransactionDto[];
 }
 
 export const getCustomerBalanceDetailReport = (
     options: ReportOptions,
 ): TDocumentDefinitions => {
-    const { fullName, nit, email, phone, sales } = options;
+    const { fullName, nit, email, phone, transactions } = options;
 
     let totalSalesAmount = 0;
     let totalPaymentsAmount = 0;
@@ -29,49 +30,37 @@ export const getCustomerBalanceDetailReport = (
     const header = [
         [
             {
-                text: 'Documento de Venta',
+                text: 'Tipo de Transacción',
                 bold: true,
                 alignment: 'center',
                 valign: 'middle',
             },
             {
-                text: 'Fecha de Venta',
+                text: 'Documento de Referencia',
                 bold: true,
                 alignment: 'center',
                 valign: 'middle',
             },
             {
-                text: 'Monto de Venta',
+                text: 'Descripción',
                 bold: true,
                 alignment: 'center',
                 valign: 'middle',
             },
             {
-                text: 'Recibo de Pago',
+                text: 'Fecha',
                 bold: true,
                 alignment: 'center',
                 valign: 'middle',
             },
             {
-                text: 'No. Depósito',
+                text: 'Monto',
                 bold: true,
                 alignment: 'center',
                 valign: 'middle',
             },
             {
-                text: 'Fecha de Pago',
-                bold: true,
-                alignment: 'center',
-                valign: 'middle',
-            },
-            {
-                text: 'Banco',
-                bold: true,
-                alignment: 'center',
-                valign: 'middle',
-            },
-            {
-                text: 'Monto de Pago',
+                text: 'Banco/Autorización',
                 bold: true,
                 alignment: 'center',
                 valign: 'middle',
@@ -85,79 +74,60 @@ export const getCustomerBalanceDetailReport = (
         ],
     ];
 
-    const content = sales.flatMap((sale) => {
-        let currentDebt = sale.amount;
+    let currentDebt = 0;
 
-        const saleRow = [
+    const content = transactions.map((transaction) => {
+        let transactionTypeText = '';
+        let additionalInfo = '';
+
+        if (transaction.transactionType === 'sale') {
+            transactionTypeText = 'Venta';
+            totalSalesAmount += transaction.amount;
+        } else if (transaction.transactionType === 'payment') {
+            transactionTypeText = 'Pago';
+            totalPaymentsAmount += transaction.amount;
+            additionalInfo = `${transaction.bankDescription || ''} / ${transaction.docAuthorization || ''}`
+        }
+
+        currentDebt += transaction.transactionType === 'sale' ? transaction.amount : -transaction.amount;
+
+        return [
             {
-                text: sale.docReference,
+                text: transactionTypeText,
                 alignment: 'center',
                 valign: 'middle',
             },
             {
-                text: DateFormatter.getDDMMYYYY(sale.createdAt),
+                text: transaction.docReference,
                 alignment: 'center',
                 valign: 'middle',
             },
             {
-                text: `Q. ${formatAmount(sale.amount)}`,
+                text: transaction.description,
+                alignment: 'center',
                 valign: 'middle',
-                bold: true,
             },
             {
-                text: '', colSpan: 5
+                text: DateFormatter.getDDMMYYYY(transaction.createdAt),
+                alignment: 'center',
+                valign: 'middle',
             },
-            {},
-            {},
-            {},
-            {},
+            {
+                text: `Q. ${formatAmount(transaction.amount)}`,
+                alignment: 'center',
+                valign: 'middle',
+            },
+            {
+                text: additionalInfo,
+                alignment: 'center',
+                valign: 'middle',
+            },
             {
                 text: `Q. ${formatAmount(currentDebt)}`,
+                alignment: 'center',
                 valign: 'middle',
             },
         ];
-
-        totalSalesAmount += sale.amount;
-
-        const paymentRows = sale.payments.map((payment: PaymentDto) => {
-            currentDebt -= payment.amount;
-            totalPaymentsAmount += payment.amount;
-
-            return [
-                {},
-                {},
-                {},
-                {
-                    text: payment.docReference,
-                    alignment: 'center',
-                    valign: 'middle',
-                },
-                {
-                    text: payment.docAuthorization,
-                    alignment: 'center',
-                    valign: 'middle',
-                },
-                {
-                    text: DateFormatter.getDDMMYYYY(payment.createdAt),
-                    alignment: 'center',
-                    valign: 'middle',
-                },
-                {
-                    text: payment.bankDescription,
-                    alignment: 'center',
-                    valign: 'middle',
-                },
-                {
-                    text: `Q. ${formatAmount(payment.amount)}`,
-                    valign: 'middle',},
-                {
-                    text: `Q. ${formatAmount(currentDebt)}`,
-                    valign: 'middle',
-                },
-            ];
-        });
-
-        return [saleRow, ...paymentRows];
     });
 
     const totalAmount = totalSalesAmount - totalPaymentsAmount;
@@ -231,7 +201,7 @@ export const getCustomerBalanceDetailReport = (
                 layout: 'customDetailLayout',
                 table: {
                     headerRows: 1,
-                    widths: ['auto', 'auto', 80, 'auto', '*', 80, '*', 80, 80],
+                    widths: ['auto', 'auto', '*', 80, 80, '*', 80],
                     body: [...header, ...content],
                 },
             },

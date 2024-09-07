@@ -37,24 +37,8 @@ export class SaleService {
       },
       include: {
         sales: {
-          where: {
-            paid: false,
-          },
           orderBy: {
             createdAt: 'asc',
-          },
-          include: {
-            payments: {
-              where: {
-                isActive: true,
-              },
-              orderBy: {
-                createdAt: 'asc',
-              },
-              include: {
-                bank: true,
-              },
-            },
           },
         },
       },
@@ -105,20 +89,9 @@ export class SaleService {
       where: { id: sale.customerId },
     });
 
-    const payments = await this.prismaService.payment.findMany({
-      where: { salesId: sale.id, isActive: true },
-    });
-
-    const totalPaid = payments.reduce(
-      (sum, payment) => sum + payment.amount,
-      0,
-    );
-    const currentDebt = sale.amount - totalPaid;
-
     const response: GetDetailById = {
       ...sale,
-      currentDebt,
-      payments,
+      currentDebt: 0,
       customer,
     };
     return response;
@@ -143,6 +116,13 @@ export class SaleService {
         `Customer with id ${createSaleDto.customerId} not found`,
       );
 
+    customer.debtAmount += createSaleDto.amount;
+
+    await this.prismaService.customer.update({
+      where: { id: createSaleDto.customerId },
+      data: { debtAmount: customer.debtAmount },
+    });
+
     return this.prismaService.sale.create({ data: createSaleDto });
   }
 
@@ -156,11 +136,6 @@ export class SaleService {
 
   async remove(id: string): Promise<Sale> {
     await this.findOne(id);
-
-    await this.prismaService.payment.updateMany({
-      where: { salesId: id },
-      data: { isActive: false },
-    });
 
     return await this.prismaService.sale.update({
       where: { id },

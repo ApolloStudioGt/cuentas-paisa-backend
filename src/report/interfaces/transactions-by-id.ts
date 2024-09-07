@@ -1,5 +1,5 @@
 export interface TransactionsById {
-    id: string;
-    startDate: Date;
-    endDate: Date;
+  id: string;
+  startDate: Date;
+  endDate: Date;
 }

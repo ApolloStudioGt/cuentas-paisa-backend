@@ -8,7 +8,7 @@ import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetAllCustomersDebt } from './interfaces/get-all-customers-debt';
-import { GetCustomerDebt, Payment, Sale } from './interfaces/get-customer-debt';
+import { GetCustomerDebt, Transaction } from './interfaces/get-customer-debt';
 import isValidNit from '../common/utils/nit-validator';
 
 @Injectable()
@@ -35,36 +35,21 @@ export class CustomerService {
           where: {
             isActive: true,
           },
-          include: {
-            payments: {
-              where: {
-                isActive: true,
-              },
-            },
-          },
         },
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     });
 
     const customersDebt: GetAllCustomersDebt[] = customers.map((customer) => {
-      let totalDebt = 0;
-
-      customer.sales.forEach((sale) => {
-        const totalPayments = sale.payments.reduce(
-          (total, payment) => total + payment.amount,
-          0,
-        );
-        const currentDebt = sale.amount - totalPayments;
-        totalDebt += currentDebt;
-      });
-
       return {
         id: customer.id,
         fullName: customer.fullName,
         nit: customer.nit,
         email: customer.email,
         phone: customer.phone,
-        currentDebt: totalDebt,
+        currentDebt: customer.debtAmount,
         createdAt: customer.createdAt,
       };
     });
@@ -81,24 +66,23 @@ export class CustomerService {
         sales: {
           where: {
             isActive: true,
-            paid: false,
           },
           orderBy: {
             createdAt: 'asc',
           },
           include: {
-            payments: {
-              where: {
-                isActive: true,
-              },
-              orderBy: {
-                createdAt: 'asc',
-              },
-              include: {
-                bank: true,
-              },
-            },
             saleType: true,
+          },
+        },
+        payments: {
+          where: {
+            isActive: true,
+          },
+          orderBy: {
+            createdAt: 'asc',
+          },
+          include: {
+            bank: true,
           },
         },
       },
@@ -107,39 +91,43 @@ export class CustomerService {
     if (!customer) {
       throw new NotFoundException('Datos del cliente no encontrados');
     }
-    let currentDebt = 0;
 
-    const salesData: Sale[] = customer.sales.map((sale) => {
-      let saleSubtotal = sale.amount;
-
-      const mappedPayments: Payment[] = sale.payments.map((payment) => {
-        saleSubtotal -= payment.amount;
-
-        return {
-          id: payment.id,
-          docReference: payment.docReference,
-          description: payment.description,
-          amount: payment.amount,
-          bankDescription: payment.bank ? payment.bank.description || '' : '',
-          docAuthorization: payment.docAuthorization || '',
-          createdAt: payment.createdAt,
-          subtotal: saleSubtotal,
-        };
-      });
-      currentDebt += saleSubtotal;
-
+    let transactions: Transaction[] = customer.sales.map((sale) => {
       return {
         id: sale.id,
         docReference: sale.docReference,
         description: sale.description,
         amount: sale.amount,
-        subtotal: saleSubtotal,
         createdAt: sale.createdAt,
-        payments: mappedPayments,
         saleType: sale.saleType.description,
         soldAt: sale.soldAt,
+        bankDescription: null,
+        docAuthorization: null,
+        transactionType: 'sale',
       };
     });
+
+    customer.payments.forEach((payment) => {
+      transactions.push({
+        id: payment.id,
+        docReference: payment.docReference,
+        description: payment.description,
+        amount: payment.amount,
+        createdAt: payment.createdAt,
+        saleType: null,
+        soldAt: null,
+        bankDescription: payment.bank.description,
+        docAuthorization: payment.docAuthorization,
+        transactionType: 'payment',
+      });
+    });
+
+    transactions = transactions.sort(
+      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+    );
+
+    //swap the order of the transactions
+    //transactions = transactions.reverse();
 
     const detailedBalanceCustomer: GetCustomerDebt = {
       id: customer.id,
@@ -147,9 +135,9 @@ export class CustomerService {
       nit: customer.nit,
       email: customer.email,
       phone: customer.phone,
-      currentDebt,
+      currentDebt: customer.debtAmount,
       createdAt: customer.createdAt,
-      sales: salesData,
+      transactions: transactions,
     };
     return detailedBalanceCustomer;
   }

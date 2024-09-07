@@ -96,8 +96,16 @@ const customerBalanceDetailLayout: Record<string, CustomTableLayout> = {
       if (i === 0) {
         return '#CACFD2';
       }
-      const row = node.table.body[i];
-      return isSaleRow(row[0]) ? '#F4F6F7' : '#FFFFFF';
+      const row = node.table.body[i];      
+      const typeTransactionCell = row[0];
+      const transactionType = typeof typeTransactionCell === 'object' && 'text' in typeTransactionCell ? typeTransactionCell.text : '';
+      
+      if (transactionType === 'Venta') {
+        return '#F4F6F7';
+      } else if (transactionType === 'Pago') {
+        return '#FFFFFF';
+      }
+      return '#FFFFFF';
     },
   },
 };

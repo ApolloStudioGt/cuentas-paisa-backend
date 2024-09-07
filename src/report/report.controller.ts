@@ -32,7 +32,7 @@ export class ReportController {
 
     response.status(200).set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename='${encodeURIComponent(reportName)}'`,
+      'Content-Disposition': `attachment; filename="${encodeURIComponent(reportName)}"`,
     });
 
     pdfDoc.info.Title = reportName;
@@ -50,7 +50,7 @@ export class ReportController {
 
     response.status(200).set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename='${encodeURIComponent(reportName)}'`,
+      'Content-Disposition': `attachment; filename="${encodeURIComponent(reportName)}"`,
     });
 
     pdfDoc.info.Title = reportName;
@@ -68,7 +68,7 @@ export class ReportController {
 
     response.status(200).set({
       'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename='${encodeURIComponent(reportName)}'`,
+      'Content-Disposition': `attachment; filename="${encodeURIComponent(reportName)}"`,
     });
 
     pdfDoc.info.Title = reportName;
