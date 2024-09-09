@@ -169,8 +169,19 @@ export class SaleService {
         isActive: true,
       },
     });
+    
+    const totalSales = activeSales.reduce((total, sale) => total + sale.amount, 0);
 
-    const newDebtAmount = activeSales.reduce((total, sale) => total + sale.amount, 0);
+    const activePayments = await this.prismaService.payment.findMany({
+      where: {
+        customerId: customer.id,
+        isActive: true,
+      },
+    });
+    
+    const totalPayments = activePayments.reduce((total, payment) => total + payment.amount, 0);
+
+    const newDebtAmount = totalSales - totalPayments
 
     await this.prismaService.customer.update({
       where: {

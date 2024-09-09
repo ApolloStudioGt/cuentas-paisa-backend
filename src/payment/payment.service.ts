@@ -96,14 +96,25 @@ export class PaymentService {
       throw new NotFoundException('Datos del cliente no encontrados');
     }
     
-    const activePayments = await this.prismaService.sale.findMany({
+    const activeSales = await this.prismaService.sale.findMany({
       where: {
         customerId: customer.id,
         isActive: true,
       },
     });
     
-    const newDebtAmount = activePayments.reduce((total, payment) => total + payment.amount, 0);
+    const totalSales = activeSales.reduce((total, sale) => total + sale.amount, 0);
+
+    const activePayments = await this.prismaService.payment.findMany({
+      where: {
+        customerId: customer.id,
+        isActive: true,
+      },
+    });
+    
+    const totalPayments = activePayments.reduce((total, payment) => total + payment.amount, 0);
+
+    const newDebtAmount = totalSales - totalPayments
 
     await this.prismaService.customer.update({
       where: {
