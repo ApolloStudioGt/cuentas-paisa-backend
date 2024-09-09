@@ -8,6 +8,7 @@ import {
   Sale as Sales,
 } from './interfaces/get-all-by-customer';
 import { GetDetailById } from './interfaces/get-detail-by-id';
+import { addAbortListener } from 'events';
 
 @Injectable()
 export class SaleService {
@@ -135,11 +136,62 @@ export class SaleService {
   }
 
   async remove(id: string): Promise<Sale> {
-    await this.findOne(id);
+    const sale = await this.findOne(id);
 
-    return await this.prismaService.sale.update({
-      where: { id },
-      data: { isActive: false },
+    if (typeof sale === 'string') {
+      throw new NotFoundException(sale);
+    }
+
+    const customerId = sale.customerId;
+
+    await this.prismaService.sale.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+      },
     });
+
+    const customer = await this.prismaService.customer.findUnique({
+      where: {
+        id: customerId,
+      },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Datos del cliente no encontrados');
+    }
+
+    const activeSales = await this.prismaService.sale.findMany({
+      where: {
+        customerId: customer.id,
+        isActive: true,
+      },
+    });
+    
+    const totalSales = activeSales.reduce((total, sale) => total + sale.amount, 0);
+
+    const activePayments = await this.prismaService.payment.findMany({
+      where: {
+        customerId: customer.id,
+        isActive: true,
+      },
+    });
+    
+    const totalPayments = activePayments.reduce((total, payment) => total + payment.amount, 0);
+
+    const newDebtAmount = totalSales - totalPayments
+
+    await this.prismaService.customer.update({
+      where: {
+        id: customer.id,
+      },
+      data: {
+        debtAmount: newDebtAmount,
+      },
+    });
+
+    return sale;
   }
 }
