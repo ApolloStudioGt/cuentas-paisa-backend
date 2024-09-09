@@ -96,7 +96,7 @@ export class PaymentService {
       throw new NotFoundException('Datos del cliente no encontrados');
     }
     
-    const activePayments = await this.prismaService.payment.findMany({
+    const activePayments = await this.prismaService.sale.findMany({
       where: {
         customerId: customer.id,
         isActive: true,
