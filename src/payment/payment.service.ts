@@ -1,8 +1,6 @@
 import {
   BadRequestException,
-  ConflictException,
   Injectable,
-  NotAcceptableException,
   NotFoundException,
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -20,12 +18,6 @@ export class PaymentService {
     });
   }
 
-  async findBySale(id: string): Promise<Payment[]> {
-    return await this.prismaService.payment.findMany({
-      where: { salesId: id, isActive: true },
-    });
-  }
-
   async findOne(id: string): Promise<Payment | string> {
     const payment = await this.prismaService.payment.findUnique({
       where: { id, isActive: true },
@@ -37,24 +29,6 @@ export class PaymentService {
   }
 
   async create(createPaymentDto: CreatePaymentDto): Promise<Payment> {
-    //Verificar si la venta ya fue saldada
-    const sale = await this.prismaService.sale.findUnique({
-      where: {
-        id: createPaymentDto.salesId,
-      },
-    });
-
-    if (!sale) {
-      throw new NotFoundException(`No se encontró la venta.`);
-    }
-
-    if (sale.paid) {
-      throw new ConflictException(
-        `La venta de: ${sale.description} ya se encuentra saldada.`,
-      );
-    }
-
-    //Si se selecciona banco que se ingrese documento autorización y visceversa
     if (createPaymentDto.bankId && !createPaymentDto.docAuthorization) {
       throw new BadRequestException(`Ingrese número de autorización.`);
     } else if (createPaymentDto.docAuthorization && !createPaymentDto.bankId) {
@@ -63,37 +37,21 @@ export class PaymentService {
       );
     }
 
-    //Sumatoria de pagos realizados a la venta
-    const totalPayments = await this.prismaService.payment.aggregate({
-      where: {
-        salesId: createPaymentDto.salesId,
-      },
-      _sum: {
-        amount: true,
-      },
+    const customer = await this.prismaService.customer.findUnique({
+      where: { id: createPaymentDto.customerId },
     });
 
-    const totalPaid = totalPayments._sum.amount || 0;
-    const saleAmount = sale.amount;
-
-    //Validar sumatoria de pagos contra monto de la venta
-    if (createPaymentDto.amount + totalPaid > saleAmount) {
-      throw new NotAcceptableException(
-        `El pago a registrar excede el monto pendiente de la venta.`,
+    if (!customer)
+      throw new NotFoundException(
+        `Customer with id ${createPaymentDto.customerId} not found`,
       );
-    }
 
-    //Actualizar valor de paid a true (saldado)
-    if (createPaymentDto.amount + totalPaid === saleAmount) {
-      await this.prismaService.sale.update({
-        where: {
-          id: createPaymentDto.salesId,
-        },
-        data: {
-          paid: true,
-        },
-      });
-    }
+    customer.debtAmount = customer.debtAmount - createPaymentDto.amount;
+
+    await this.prismaService.customer.update({
+      where: { id: createPaymentDto.customerId },
+      data: { debtAmount: customer.debtAmount },
+    });
 
     return await this.prismaService.payment.create({ data: createPaymentDto });
   }
@@ -111,10 +69,62 @@ export class PaymentService {
   }
 
   async remove(id: string): Promise<Payment> {
-    await this.findOne(id);
-    return await this.prismaService.payment.update({
-      where: { id },
-      data: { isActive: false },
+    const payment = await this.findOne(id);
+
+    if (typeof payment === 'string') {
+      throw new NotFoundException(payment);
+    }
+
+    const customerId = payment.customerId;
+
+    await this.prismaService.payment.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+      },
     });
+
+    const customer = await this.prismaService.customer.findUnique({
+      where: {
+        id: customerId,
+      },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Datos del cliente no encontrados');
+    }
+    
+    const activeSales = await this.prismaService.sale.findMany({
+      where: {
+        customerId: customer.id,
+        isActive: true,
+      },
+    });
+    
+    const totalSales = activeSales.reduce((total, sale) => total + sale.amount, 0);
+
+    const activePayments = await this.prismaService.payment.findMany({
+      where: {
+        customerId: customer.id,
+        isActive: true,
+      },
+    });
+    
+    const totalPayments = activePayments.reduce((total, payment) => total + payment.amount, 0);
+
+    const newDebtAmount = totalSales - totalPayments
+
+    await this.prismaService.customer.update({
+      where: {
+        id: customer.id,
+      },
+      data: {
+        debtAmount: newDebtAmount,
+      },
+    });
+
+    return payment;
   }
 }

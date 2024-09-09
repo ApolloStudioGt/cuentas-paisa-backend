@@ -6,28 +6,18 @@ export interface GetCustomerDebt {
   phone: string;
   createdAt: Date;
   currentDebt: number;
-  sales: Sale[];
+  transactions: Transaction[];
 }
 
-export interface Sale {
+export interface Transaction {
   id: string;
   docReference: string;
   description: string;
   amount: number;
-  subtotal: number;
   createdAt: Date;
-  saleType: string;
-  soldAt: Date;
-  payments: Payment[];
-}
-
-export interface Payment {
-  id: string;
-  docReference: string;
-  description: string;
-  amount: number;
-  bankDescription: string;
-  docAuthorization: string;
-  createdAt: Date;
-  subtotal: number;
+  saleType?: string;
+  soldAt?: Date;
+  bankDescription?: string;
+  docAuthorization?: string;
+  transactionType?: string;
 }

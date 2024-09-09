@@ -27,11 +27,6 @@ export class PaymentController {
     return this.paymentService.findOne(id);
   }
 
-  @Get('bysale/:id')
-  findBySale(@Param('id') id: string) {
-    return this.paymentService.findBySale(id);
-  }
-
   @Post()
   @ApiOperation({ summary: 'Create a new payment transaction' })
   create(@Body() createPaymentDto: CreatePaymentDto) {

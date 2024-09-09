@@ -36,28 +36,47 @@ export const getCustomerBalanceReport = (
         layout: 'customLayout',
         table: {
           headerRows: 1,
-          widths: ['*', 150, 150],
+          widths: ['*', 225, 225],
           body: [
             [
               {
-                text: 'CLIENTE',
+                text: 'Cliente',
                 bold: true,
+                alignment: 'center',
+                valign: 'middle',
               },
               {
-                text: 'SALDO PENDIENTE',
+                text: 'Saldo Pendiente',
                 bold: true,
+                alignment: 'center',
+                valign: 'middle',
               },
               {
-                text: 'FECHA DE CORTE',
+                text: 'Fecha de Corte',
                 bold: true,
+                alignment: 'center',
+                valign: 'middle',
               },
             ],
             ...customerBalance.map((balance) => {
               totalAmount += balance.amount;
               return [
-                { text: balance.customer.fullName, bold: true },
-                { text: `Q. ${formatAmount(balance.amount).toString()}` },
-                { text: DateFormatter.getDDMMMMYYYY(balance.createdAt) },
+                {
+                  text: balance.customer.fullName, 
+                  bold: true,
+                  alignment: 'center',
+                  valign: 'middle',
+                },
+                {
+                  text: `Q. ${formatAmount(balance.amount).toString()}`,
+                  alignment: 'center',
+                  valign: 'middle',
+                },
+                {
+                  text: DateFormatter.getDDMMMMYYYY(balance.createdAt),
+                  alignment: 'center',
+                  valign: 'middle',
+                },
               ];
             }),
           ],

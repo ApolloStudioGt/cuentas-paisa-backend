@@ -12,12 +12,11 @@ import {
 } from './definitions';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CustomerService } from 'src/customer/customer.service';
-import { CustomerBalanceDetailDto } from './dto/detail-customer-balance.dto';
+import { CustomerTransactionDto } from './dto/detail-customer-balance.dto';
 import { TransactionsById } from './interfaces/transactions-by-id';
 import {
   GetCustomerDebt,
-  Payment,
-  Sale,
+  Transaction,
 } from 'src/customer/interfaces/get-customer-debt';
 import { SummaryTransactions } from './interfaces/summary-transactions';
 
@@ -41,34 +40,15 @@ export class ReportService {
           sales: {
             where: {
               isActive: true,
-              paid: false,
-            },
-            include: {
-              payments: {
-                where: {
-                  isActive: true,
-                },
-              },
             },
           },
         },
       });
 
       const customerBalance = customers.map((customer) => {
-        let currentDebt = 0;
-
-        customer.sales.forEach((sale) => {
-          const totalPayments = sale.payments.reduce(
-            (total, payment) => total + payment.amount,
-            0,
-          );
-          const total = sale.amount - totalPayments;
-          currentDebt += total;
-        });
-
         return {
           customer,
-          amount: currentDebt,
+          amount: customer.debtAmount,
           createdAt: new Date(),
         };
       });
@@ -95,33 +75,31 @@ export class ReportService {
         throw new NotFoundException('Datos del cliente no encontrados');
       }
 
-      const data: CustomerBalanceDetailDto[] = customerDetail.sales.map(
-        (sale) => {
-          const payments = sale.payments.map((payment) => ({
-            docReference: payment.docReference,
-            docAuthorization: payment.docAuthorization || '',
-            createdAt: payment.createdAt,
-            bankDescription: payment.bankDescription || '',
-            amount: payment.amount,
-          }));
+      const data: CustomerTransactionDto[] = [];
 
-          return {
-            docReference: sale.docReference,
-            createdAt: sale.createdAt,
-            amount: sale.amount,
-            payments,
-          };
-        },
-      );
+      customerDetail.transactions.forEach((transaction) => {
+        if (transaction.transactionType === 'sale' || transaction.transactionType === 'payment') {
+          data.push({
+            docReference: transaction.docReference,
+            description: transaction.description,
+            amount: transaction.amount,
+            createdAt: transaction.createdAt,
+            saleType: transaction.saleType || null,
+            soldAt: transaction.soldAt || null,
+            bankDescription: transaction.bankDescription || null,
+            docAuthorization: transaction.docAuthorization || null,
+            transactionType: transaction.transactionType,
+          });
+        }
+      });
 
       const docDefinition = getCustomerBalanceDetailReport({
         fullName: customerDetail.fullName,
         nit: customerDetail.nit,
         email: customerDetail.email,
         phone: customerDetail.phone,
-        sales: data,
+        transactions: data,
       });
-
       const pdfDoc = this.printerService.createPdf(docDefinition);
 
       const currentDate = new Date()
@@ -148,17 +126,9 @@ export class ReportService {
         where: {
           id,
           isActive: true,
-          sales: {
-            some: {
-              createdAt: {
-                gte: new Date(startDate),
-                lte: new Date(`${endDate}T23:59:59.999Z`),
-              },
-            },
-          },
         },
         include: {
-          sales: {
+          sales:{
             where: {
               isActive: true,
               createdAt: {
@@ -170,18 +140,22 @@ export class ReportService {
               createdAt: 'asc',
             },
             include: {
-              payments: {
-                where: {
-                  isActive: true,
-                },
-                orderBy: {
-                  createdAt: 'asc',
-                },
-                include: {
-                  bank: true,
-                },
-              },
               saleType: true,
+            },
+          },
+          payments: {
+            where: {
+              isActive: true,
+              createdAt: {
+                gte: new Date(startDate),
+                lte: new Date(`${endDate}T23:59:59.999Z`),
+              },
+            },
+            orderBy: {
+              createdAt: 'asc',
+            },
+            include: {
+              bank: true,
             },
           },
         },
@@ -193,43 +167,37 @@ export class ReportService {
         );
       }
 
-      const salesData: Sale[] = customer.sales.map((sale) => {
-        let saleSubtotal = sale.amount;
-
-        const mappedPayments: Payment[] = sale.payments.map((payment) => {
-          saleSubtotal -= payment.amount;
-
-          return {
-            id: payment.id,
-            docReference: payment.docReference,
-            description: payment.description,
-            amount: payment.amount,
-            bankDescription: payment.bank ? payment.bank.description || '' : '',
-            docAuthorization: payment.docAuthorization || '',
-            createdAt: payment.createdAt,
-            subtotal: saleSubtotal,
-          };
-        });
-
-        return {
-          id: sale.id,
+      const transactionsData: CustomerTransactionDto[] = [
+        ...customer.sales.map((sale) => ({
           docReference: sale.docReference,
           description: sale.description,
           amount: sale.amount,
-          subtotal: saleSubtotal,
           createdAt: sale.createdAt,
-          payments: mappedPayments,
-          saleType: sale.saleType.description,
-          soldAt: sale.soldAt,
-        };
-      });
+          saleType: sale.saleType?.description || null,
+          soldAt: sale.soldAt || null,
+          bankDescription: null,
+          docAuthorization: null,
+          transactionType: 'sale' as 'sale',
+        })),
+        ...customer.payments.map((payment) => ({
+          docReference: payment.docReference,
+          description: payment.description,
+          amount: payment.amount,
+          createdAt: payment.createdAt,
+          saleType: null,
+          soldAt: null,
+          bankDescription: payment.bank?.description || null,
+          docAuthorization: payment.docAuthorization,
+          transactionType: 'payment' as 'payment',
+        })),
+      ];
 
       const docDefinition = getCustomerBalanceDetailReport({
         fullName: customer.fullName,
         nit: customer.nit,
         email: customer.email,
         phone: customer.phone,
-        sales: salesData,
+        transactions: transactionsData,
       });
 
       const pdfDoc = this.printerService.createPdf(docDefinition);
@@ -252,14 +220,6 @@ export class ReportService {
       const customersData = await this.prismaService.customer.findMany({
         where: {
           isActive: true,
-          sales: {
-            some: {
-              createdAt: {
-                gte: new Date(startDate),
-                lte: new Date(`${endDate}T23:59:59.999Z`),
-              },
-            },
-          },
         },
         include: {
           sales: {
@@ -274,18 +234,22 @@ export class ReportService {
               createdAt: 'asc',
             },
             include: {
-              payments: {
-                where: {
-                  isActive: true,
-                },
-                orderBy: {
-                  createdAt: 'asc',
-                },
-                include: {
-                  bank: true,
-                },
-              },
               saleType: true,
+            },
+          },
+          payments: {
+            where: {
+              isActive: true,
+              createdAt: {
+                gte: new Date(startDate),
+                lte: new Date(`${endDate}T23:59:59.999Z`),
+              },
+            },
+            orderBy: {
+              createdAt: 'asc',
+            },
+            include: {
+              bank: true,
             },
           },
         },
@@ -298,40 +262,42 @@ export class ReportService {
       }
 
       const mappedData: GetCustomerDebt[] = customersData.map((customer) => {
-        let currentDebt = 0;
 
-        const salesData: Sale[] = customer.sales.map((sale) => {
-          let saleSubtotal = sale.amount;
+        const totalSalesAmount = customer.sales.reduce((sum, sale) => sum + sale.amount, 0);
+        const totalPaymentsAmount = customer.payments.reduce((sum, payment) => sum + payment.amount, 0);
 
-          const mappedPayments: Payment[] = sale.payments.map((payment) => {
-            saleSubtotal -= payment.amount;
+        const currentDebt = totalSalesAmount - totalPaymentsAmount;
 
-            return {
-              id: payment.id,
-              docReference: payment.docReference,
-              description: payment.description,
-              amount: payment.amount,
-              bankDescription: payment.bank ? payment.bank.description : '',
-              docAuthorization: payment.docAuthorization || '',
-              createdAt: payment.createdAt,
-              subtotal: saleSubtotal,
-            };
-          });
+        const salesData: Transaction[] = customer.sales.map((sale) => ({
+          id: sale.id,
+          docReference: sale.docReference,
+          description: sale.description,
+          amount: sale.amount,
+          createdAt: sale.createdAt,
+          saleType: sale.saleType?.description || null,
+          soldAt: sale.soldAt || null,
+          bankDescription: null,
+          docAuthorization: null,
+          transactionType: 'sale',
+        }));
 
-          currentDebt += saleSubtotal;
+        const paymentsData: Transaction[] = customer.payments.map((payment) => ({
+          id: payment.id,
+          docReference: payment.docReference,
+          description: payment.description,
+          amount: payment.amount,
+          createdAt: payment.createdAt,
+          saleType: null,
+          soldAt: null,
+          bankDescription: payment.bank?.description || null,
+          docAuthorization: payment.docAuthorization || null,
+          transactionType: 'payment',
+        }));
 
-          return {
-            id: sale.id,
-            docReference: sale.docReference,
-            description: sale.description,
-            amount: sale.amount,
-            subtotal: saleSubtotal,
-            createdAt: sale.createdAt,
-            payments: mappedPayments,
-            saleType: sale.saleType.description,
-            soldAt: sale.soldAt,
-          };
-        });
+        const transactionsData: Transaction[] = [
+          ...salesData,
+          ...paymentsData,
+        ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
         return {
           id: customer.id,
@@ -340,8 +306,8 @@ export class ReportService {
           email: customer.email,
           phone: customer.phone,
           createdAt: customer.createdAt,
-          currentDebt,
-          sales: salesData,
+          currentDebt: currentDebt,
+          transactions: transactionsData,
         };
       });
 

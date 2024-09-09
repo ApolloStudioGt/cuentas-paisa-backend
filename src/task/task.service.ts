@@ -32,9 +32,6 @@ export class TasksService {
             lt: new Date(new Date().setHours(23, 59, 59, 999)),
           },
         },
-        include: {
-          payments: true,
-        },
       });
       // Calcular la deuda total del cliente
       // Si no hay corte anterior, la deuda total es 0
@@ -43,10 +40,7 @@ export class TasksService {
       this.logger.log('Total debt: ' + totalDebt);
 
       sales.forEach((sale) => {
-        const totalPayments = sale.payments.reduce(
-          (total, payment) => total + payment.amount,
-          0,
-        );
+        const totalPayments = 0;
         const currentDebt = sale.amount - totalPayments;
         totalDebt += currentDebt;
       });
