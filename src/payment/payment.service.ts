@@ -69,10 +69,51 @@ export class PaymentService {
   }
 
   async remove(id: string): Promise<Payment> {
-    await this.findOne(id);
-    return await this.prismaService.payment.update({
-      where: { id },
-      data: { isActive: false },
+    const payment = await this.findOne(id);
+
+    if (typeof payment === 'string') {
+      throw new NotFoundException(payment);
+    }
+
+    const customerId = payment.customerId;
+
+    await this.prismaService.payment.update({
+      where: {
+        id,
+      },
+      data: {
+        isActive: false,
+      },
     });
+
+    const customer = await this.prismaService.customer.findUnique({
+      where: {
+        id: customerId,
+      },
+    });
+
+    if (!customer) {
+      throw new NotFoundException('Datos del cliente no encontrados');
+    }
+    
+    const activePayments = await this.prismaService.payment.findMany({
+      where: {
+        customerId: customer.id,
+        isActive: true,
+      },
+    });
+    
+    const newDebtAmount = activePayments.reduce((total, payment) => total + payment.amount, 0);
+
+    await this.prismaService.customer.update({
+      where: {
+        id: customer.id,
+      },
+      data: {
+        debtAmount: newDebtAmount,
+      },
+    });
+
+    return payment;
   }
 }
