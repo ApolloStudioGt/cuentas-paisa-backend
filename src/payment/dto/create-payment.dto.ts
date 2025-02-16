@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsISO8601,
   IsUUID,
 } from 'class-validator';
 export class CreatePaymentDto {
@@ -36,4 +37,9 @@ export class CreatePaymentDto {
   @IsOptional()
   @IsString()
   docAuthorization?: string;
+
+  @ApiProperty({ description: 'Payment transaction sold date' })
+  @IsNotEmpty()
+  @IsISO8601()
+  paidAt: string;
 }

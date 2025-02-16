@@ -68,7 +68,7 @@ export class CustomerService {
             isActive: true,
           },
           orderBy: {
-            createdAt: 'asc',
+            soldAt: 'desc',
           },
           include: {
             saleType: true,
@@ -79,7 +79,7 @@ export class CustomerService {
             isActive: true,
           },
           orderBy: {
-            createdAt: 'asc',
+            paidAt: 'desc',
           },
           include: {
             bank: true,
@@ -101,6 +101,7 @@ export class CustomerService {
         createdAt: sale.createdAt,
         saleType: sale.saleType.description,
         soldAt: sale.soldAt,
+        paidAt: null,
         bankDescription: null,
         docAuthorization: null,
         transactionType: 'sale',
@@ -116,15 +117,23 @@ export class CustomerService {
         createdAt: payment.createdAt,
         saleType: null,
         soldAt: null,
+        paidAt: payment.paidAt,
         bankDescription: payment.bank.description,
         docAuthorization: payment.docAuthorization,
         transactionType: 'payment',
       });
     });
 
-    transactions = transactions.sort(
-      (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
-    );
+    //sort the transactions by each date (if it is a sale, by soldAt, if it is a payment, by paidAt)
+    transactions = transactions.sort((a, b) => {
+      const dateA = a.soldAt
+        ? new Date(a.soldAt).getTime()
+        : new Date(a.paidAt).getTime();
+      const dateB = b.soldAt
+        ? new Date(b.soldAt).getTime()
+        : new Date(b.paidAt).getTime();
+      return dateB - dateA;
+    });
 
     //swap the order of the transactions
     //transactions = transactions.reverse();

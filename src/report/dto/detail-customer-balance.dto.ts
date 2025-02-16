@@ -5,6 +5,7 @@ export class CustomerTransactionDto {
   createdAt: Date;
   saleType?: string | null;
   soldAt?: Date | null;
+  paidAt?: Date | null;
   bankDescription?: string | null;
   docAuthorization?: string | null;
   transactionType: 'sale' | 'payment';

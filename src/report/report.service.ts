@@ -78,7 +78,10 @@ export class ReportService {
       const data: CustomerTransactionDto[] = [];
 
       customerDetail.transactions.forEach((transaction) => {
-        if (transaction.transactionType === 'sale' || transaction.transactionType === 'payment') {
+        if (
+          transaction.transactionType === 'sale' ||
+          transaction.transactionType === 'payment'
+        ) {
           data.push({
             docReference: transaction.docReference,
             description: transaction.description,
@@ -86,6 +89,7 @@ export class ReportService {
             createdAt: transaction.createdAt,
             saleType: transaction.saleType || null,
             soldAt: transaction.soldAt || null,
+            paidAt: transaction.paidAt || null,
             bankDescription: transaction.bankDescription || null,
             docAuthorization: transaction.docAuthorization || null,
             transactionType: transaction.transactionType,
@@ -93,12 +97,23 @@ export class ReportService {
         }
       });
 
+      //sort the transactions by each date (if it is a sale, by soldAt, if it is a payment, by paidAt)
+      const transactionsData: CustomerTransactionDto[] = data.sort((a, b) => {
+        const dateA = a.soldAt
+          ? new Date(a.soldAt).getTime()
+          : new Date(a.paidAt).getTime();
+        const dateB = b.soldAt
+          ? new Date(b.soldAt).getTime()
+          : new Date(b.paidAt).getTime();
+        return dateA - dateB;
+      });
+
       const docDefinition = getCustomerBalanceDetailReport({
         fullName: customerDetail.fullName,
         nit: customerDetail.nit,
         email: customerDetail.email,
         phone: customerDetail.phone,
-        transactions: data,
+        transactions: transactionsData,
       });
       const pdfDoc = this.printerService.createPdf(docDefinition);
 
@@ -128,7 +143,7 @@ export class ReportService {
           isActive: true,
         },
         include: {
-          sales:{
+          sales: {
             where: {
               isActive: true,
               createdAt: {
@@ -262,9 +277,14 @@ export class ReportService {
       }
 
       const mappedData: GetCustomerDebt[] = customersData.map((customer) => {
-
-        const totalSalesAmount = customer.sales.reduce((sum, sale) => sum + sale.amount, 0);
-        const totalPaymentsAmount = customer.payments.reduce((sum, payment) => sum + payment.amount, 0);
+        const totalSalesAmount = customer.sales.reduce(
+          (sum, sale) => sum + sale.amount,
+          0,
+        );
+        const totalPaymentsAmount = customer.payments.reduce(
+          (sum, payment) => sum + payment.amount,
+          0,
+        );
 
         const currentDebt = totalSalesAmount - totalPaymentsAmount;
 
@@ -281,23 +301,34 @@ export class ReportService {
           transactionType: 'sale',
         }));
 
-        const paymentsData: Transaction[] = customer.payments.map((payment) => ({
-          id: payment.id,
-          docReference: payment.docReference,
-          description: payment.description,
-          amount: payment.amount,
-          createdAt: payment.createdAt,
-          saleType: null,
-          soldAt: null,
-          bankDescription: payment.bank?.description || null,
-          docAuthorization: payment.docAuthorization || null,
-          transactionType: 'payment',
-        }));
+        const paymentsData: Transaction[] = customer.payments.map(
+          (payment) => ({
+            id: payment.id,
+            docReference: payment.docReference,
+            description: payment.description,
+            amount: payment.amount,
+            createdAt: payment.createdAt,
+            saleType: null,
+            soldAt: null,
+            bankDescription: payment.bank?.description || null,
+            docAuthorization: payment.docAuthorization || null,
+            transactionType: 'payment',
+          }),
+        );
 
+        //sort the transactions by each date (if it is a sale, by soldAt, if it is a payment, by paidAt)
         const transactionsData: Transaction[] = [
-          ...salesData,
           ...paymentsData,
-        ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+          ...salesData,
+        ].sort((a, b) => {
+          const dateA = a.soldAt
+            ? new Date(a.soldAt).getTime()
+            : new Date(a.paidAt).getTime();
+          const dateB = b.soldAt
+            ? new Date(b.soldAt).getTime()
+            : new Date(b.paidAt).getTime();
+          return dateA - dateB;
+        });
 
         return {
           id: customer.id,

@@ -20,4 +20,5 @@ export interface Transaction {
   bankDescription?: string;
   docAuthorization?: string;
   transactionType?: string;
+  paidAt?: Date;
 }

@@ -62,7 +62,7 @@ export const getCustomerBalanceReport = (
               totalAmount += balance.amount;
               return [
                 {
-                  text: balance.customer.fullName, 
+                  text: balance.customer.fullName,
                   bold: true,
                   alignment: 'center',
                   valign: 'middle',
