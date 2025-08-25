@@ -200,7 +200,7 @@ export class ReportService {
           amount: payment.amount,
           createdAt: payment.createdAt,
           saleType: null,
-          soldAt: null,
+          soldAt: payment.paidAt || null,
           bankDescription: payment.bank?.description || null,
           docAuthorization: payment.docAuthorization,
           transactionType: 'payment' as 'payment',
